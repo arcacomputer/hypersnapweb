@@ -32,6 +32,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Test
+        run: npm test
+        env:
+          TMPDIR: ${{ runner.temp }}
+
       - name: Lint
         run: npm run lint
 

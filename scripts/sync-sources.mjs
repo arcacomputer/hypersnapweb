@@ -1,5 +1,6 @@
 import { mkdir, writeFile, readFile, rename, unlink } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
+import { isDeepStrictEqual } from "node:util";
 import { pathToFileURL } from "node:url";
 import path from "node:path";
 import process from "node:process";
@@ -491,6 +492,21 @@ export function validateSnapshot(snapshot, previous) {
   }
 }
 
+export async function writeSnapshotIfChanged(file, snapshot, previous) {
+  // Validate before deciding to skip: an incomplete refresh must still fail.
+  validateSnapshot(snapshot, previous);
+  const content = (value) => {
+    const comparable = { ...value };
+    // Ignore only this root-level collection clock, not upstream timestamps.
+    delete comparable.collectedAt;
+    // Compare the JSON that would be persisted (undefined fields are omitted).
+    return JSON.parse(JSON.stringify(comparable));
+  };
+  if (previous && isDeepStrictEqual(content(snapshot), content(previous))) return false;
+  await atomicWriteSnapshot(file, snapshot);
+  return true;
+}
+
 export function resolveGithubToken({ environment = process.env, execute = execFileSync } = {}) {
   // CI supplies a repository-scoped token; no stored gh account exists there.
   const supplied = environment.GH_TOKEN?.trim() || environment.GITHUB_TOKEN?.trim();
@@ -566,10 +582,9 @@ async function main() {
     repos: repoSnapshots,
   };
 
-  validateSnapshot(snapshot, previous);
   if (Date.now() - startedAt > 180_000) throw new Error("Source collection runtime budget exceeded");
-  await atomicWriteSnapshot(OUT_FILE, snapshot);
-  console.log(JSON.stringify({ repos: repoSnapshots.map((repo) => ({ name: repo.name, sourceCommit: repo.sourceCommit ?? null, isEmpty: repo.isEmpty, docs: repo.docsLinks.length })), collectedAt: snapshot.collectedAt, sourceUpdatedAt, requests: client.requests, bytes: client.bytes }));
+  const changed = await writeSnapshotIfChanged(OUT_FILE, snapshot, previous);
+  console.log(JSON.stringify({ changed, checkedAt: snapshot.collectedAt, collectedAt: changed ? snapshot.collectedAt : previous.collectedAt, repos: repoSnapshots.map((repo) => ({ name: repo.name, sourceCommit: repo.sourceCommit ?? null, isEmpty: repo.isEmpty, docs: repo.docsLinks.length })), sourceUpdatedAt, requests: client.requests, bytes: client.bytes }));
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
