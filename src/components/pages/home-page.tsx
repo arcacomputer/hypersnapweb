@@ -18,25 +18,33 @@ import type { NetworkStatus, NodeHealthStatus } from "@/lib/types";
 
 const paths = [
   {
+    audience: "Token guide",
+    title: "$SNAP, explained",
+    description: "Understand the token, distribution claims and proposed network rewards.",
+    href: "/snap",
+    action: "Read the $SNAP guide",
+    icon: Layers3,
+  },
+  {
     audience: "For the curious",
     title: "Understand the project",
-    description: "Get the context behind the fork, then follow the decisions and development as they happen.",
+    description: "What Hypersnap is, why it exists, and how the pieces fit together.",
     href: "/about",
     action: "Start with the overview",
     icon: BookOpen,
   },
   {
     audience: "For builders",
-    title: "Find your starting point",
-    description: "Explore the docs, public read interfaces, and source. Check what’s ready before building on it.",
+    title: "Build an app",
+    description: "Read the APIs and guides for social apps, tools and integrations.",
     href: "/docs",
     action: "Explore the documentation",
     icon: Braces,
   },
   {
     audience: "For operators",
-    title: "Run a piece of it",
-    description: "Review the requirements, deployment guide, and operational checks before bringing a node online.",
+    title: "Run a node",
+    description: "Learn the requirements, install the software and check your node.",
     href: "/run-a-node",
     action: "Read the operator guide",
     icon: Terminal,
@@ -126,39 +134,12 @@ export function HomePage({
     <div className="hs-home">
       <HeroSection />
 
-      <section className="hs-section hs-container" aria-labelledby="hs-updates-title">
-        <div className="hs-section-heading">
-          <div>
-            <p className="hs-eyebrow">Latest developments</p>
-            <h2 id="hs-updates-title">The work, not the hype.</h2>
-            <p>Merged changes and open ideas, with a source for every update.</p>
-          </div>
-          <a className="hs-text-link" href="/updates">All updates <ArrowRight aria-hidden="true" /></a>
-        </div>
-        <div className="hs-update-grid">
-          {development.updates.slice(0, 3).map((update) => (
-            <article className="hs-update-card" key={update.id}>
-              <div className="hs-card-meta">
-                <span className={`hs-label hs-label-${update.status}`}>{updateLabels[update.status]}</span>
-                <time dateTime={update.date}>{snapshotDate(update.date)}</time>
-              </div>
-              <h3><a href={update.url}>{update.title}</a></h3>
-              <p>{update.summary}</p>
-              <a className="hs-text-link" href={update.url} aria-label={`Read source: ${update.title}`}>
-                Read source <ArrowUpRight aria-hidden="true" />
-              </a>
-            </article>
-          ))}
-        </div>
-        <p className="hs-section-note">A merged change is not a deployment report. Proposals and discussions are not shipped features.</p>
-      </section>
-
       <section className="hs-path-section" aria-labelledby="hs-paths-title">
         <div className="hs-container hs-section">
           <div className="hs-section-heading">
             <div>
               <p className="hs-eyebrow">Choose your path</p>
-              <h2 id="hs-paths-title">A way in, wherever you start.</h2>
+              <h2 id="hs-paths-title">What would you like to do?</h2>
             </div>
           </div>
           <div className="hs-path-grid">
@@ -178,8 +159,8 @@ export function HomePage({
         <div className="hs-section-heading">
           <div>
             <p className="hs-eyebrow">The ecosystem</p>
-            <h2 id="hs-ecosystem-title">Different layers. One open effort.</h2>
-            <p>Nodes serve the data. Protocol work shapes the rules. Apps explore what people can do with them.</p>
+            <h2 id="hs-ecosystem-title">How does it work?</h2>
+            <p>Nodes share social data. Apps turn it into an experience. The community works on the rules and tools.</p>
           </div>
           <a className="hs-text-link" href="#project-sources">Find the project sources <ArrowRight aria-hidden="true" /></a>
         </div>
@@ -193,7 +174,8 @@ export function HomePage({
             </li>
           ))}
         </ol>
-        <div className="hs-repos-heading" id="project-sources"><GitBranch aria-hidden="true" /><h3>Find the source</h3><span>Public repositories</span></div>
+        <details className="guide-disclosure" id="project-sources"><summary>Explore the source repositories</summary>
+        <div className="hs-repos-heading"><GitBranch aria-hidden="true" /><h3>Find the source</h3><span>Public repositories</span></div>
         <div className="hs-repo-grid">
           {development.repos.map((repo) => (
             <a className="hs-repo-link" href={repo.url} key={repo.name}>
@@ -203,10 +185,39 @@ export function HomePage({
           ))}
         </div>
         <p className="hs-section-note">These are connected areas of development, not a guarantee that every Farcaster app or native API is ready.</p>
+        </details>
+      </section>
+
+      <section className="hs-section hs-container" aria-labelledby="hs-updates-title">
+        <div className="hs-section-heading">
+          <div>
+            <p className="hs-eyebrow">Latest developments</p>
+            <h2 id="hs-updates-title">What’s new?</h2>
+            <p>Recent code changes and proposals from the community.</p>
+          </div>
+          <a className="hs-text-link" href="/updates">All updates <ArrowRight aria-hidden="true" /></a>
+        </div>
+        <div className="hs-update-grid">
+          {development.updates.slice(0, 3).map((update) => (
+            <article className="hs-update-card" key={update.id}>
+              <div className="hs-card-meta">
+                <span className={`hs-label hs-label-${update.status}`}>{updateLabels[update.status]}</span>
+                <time dateTime={update.date}>{snapshotDate(update.date)}</time>
+              </div>
+              <h3><a href={update.url}>{update.title}</a></h3>
+              <details className="hs-card-details"><summary>Read the update</summary><p>{update.summary}</p></details>
+              <a className="hs-text-link" href={update.url} aria-label={`Read source: ${update.title}`}>
+                Read source <ArrowUpRight aria-hidden="true" />
+              </a>
+            </article>
+          ))}
+        </div>
+        <p className="hs-section-note">A merged change is not a deployment report. Proposals and discussions are not shipped features.</p>
       </section>
 
       <section className="hs-telemetry-section" aria-labelledby="hs-network-title">
         <div className="hs-container hs-section">
+          <details className="guide-disclosure"><summary>Technical status: public endpoints</summary>
           <div className="hs-section-heading">
             <div>
               <p className="hs-eyebrow">Public infrastructure</p>
@@ -227,6 +238,7 @@ export function HomePage({
             <p>Endpoint availability does not establish complete archives, fork adoption, validator decentralization, or native app readiness.</p>
             {networkStatus ? <span>Sampled <time dateTime={networkStatus.checkedAt}>{new Date(networkStatus.checkedAt).toISOString().replace("T", " ").slice(0, 19)} UTC</time> · open telemetry for current checks.</span> : <span>Open telemetry to check current endpoint availability.</span>}
           </div>
+          </details>
         </div>
       </section>
 
@@ -243,7 +255,7 @@ export function HomePage({
         <aside className="hs-stewardship" aria-label="Portal stewardship and token information">
           <p className="hs-eyebrow">An independently maintained portal</p>
           <p>Hypersnap.org is maintained by <a href={creator.website}>{creator.name}</a> / <a href="https://arca.computer">Arca</a>, contributing to the open Farcasterorg effort.</p>
-          <a className="hs-text-link" href="/snap">Economics &amp; token provenance <ArrowUpRight aria-hidden="true" /></a>
+          <a className="hs-text-link" href="/snap">$SNAP token guide <ArrowUpRight aria-hidden="true" /></a>
         </aside>
       </section>
     </div>

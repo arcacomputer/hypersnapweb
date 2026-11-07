@@ -192,3 +192,33 @@
   .hs-button, .hs-label, .hs-mark { border: 1px solid ButtonText; }
   .hs-layer + .hs-layer::before { display: none; }
 }
+
+
+/* Clarity first: short introductions, obvious paths, optional technical detail. */
+.hs-path-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.guide-page .dev-header { padding-bottom: 2rem; }
+.guide-intro { max-width: 70ch; margin-top: 1.2rem; font-size: 1rem; line-height: 1.85; color: #bec9dc; }
+.guide-page .dev-section > h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 550; line-height: 1.25; letter-spacing: -.03em; }
+.guide-grid { margin-top: 1.8rem; }
+.guide-page .dev-theme a { display: inline-block; margin-top: 1rem; color: #b4caff; font-size: .86rem; text-underline-offset: .2em; }
+.guide-disclosure { margin-top: 1.2rem; border: 1px solid rgba(177,194,229,.16); border-radius: .65rem; padding: 1.1rem 1.25rem; scroll-margin-top: 7rem; }
+.guide-disclosure > summary { cursor: pointer; color: #e0e7f5; font-size: .95rem; font-weight: 550; line-height: 1.6; }
+.guide-disclosure > summary:focus-visible { outline: 2px solid #8bd9e6; outline-offset: 5px; }
+.guide-disclosure > p, .guide-disclosure > ul { margin-top: 1rem; color: #b5c2d8; font-size: .9rem; line-height: 1.85; max-width: 75ch; }
+.guide-disclosure > ul { padding-left: 1.2rem; list-style: disc; }
+.guide-disclosure a { color: #b4caff; text-decoration: underline; text-underline-offset: .2em; }
+.guide-disclosure .dev-theme-grid { margin-top: 1.25rem; }
+.guide-disclosure .dev-theme a { text-decoration: none; }
+.guide-disclosure .hs-repo-link { text-decoration: none; }
+.guide-caption { margin-top: 1rem; color: #9aaac3; font-size: .8rem; line-height: 1.75; }
+.guide-contract { margin-top: 1.5rem; }
+.guide-contract .guide-contract-label { margin-top: 1.5rem; color: #b5c2d8; font-size: .75rem; }
+.guide-contract code { display: block; margin-top: .5rem; overflow-wrap: anywhere; color: #c0e9f1; font-size: .85rem; }
+.hs-card-details { margin-block: .7rem 1rem; color: var(--hs-muted); font-size: .82rem; }
+.hs-card-details summary { cursor: pointer; color: var(--hs-accent); padding-block: .3rem; }
+.hs-card-details p { margin-top: .7rem; line-height: 1.85; }
+.hs-update-card > .hs-text-link { margin-top: auto; }
+.hs-telemetry-section .guide-disclosure { margin-top: 0; }
+.hs-telemetry-section .guide-disclosure[open] > .hs-section-heading { margin-top: 1.5rem; }
+@media(max-width:960px) { .hs-path-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media(max-width:700px) { .hs-path-grid { grid-template-columns: minmax(0,1fr); } .guide-disclosure { padding: 1rem; } }

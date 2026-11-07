@@ -4,7 +4,7 @@ import { development, statusLabels, type DevelopmentStatus } from "@/data/develo
 
 const filters: Array<{ value: "all" | DevelopmentStatus; label: string }> = [
   { value: "all", label: "All work" },
-  { value: "merged", label: "Merged source" },
+  { value: "merged", label: "Code changes" },
   { value: "proposal", label: "Open proposals" },
   { value: "discussion", label: "Discussions" },
 ];
@@ -22,22 +22,22 @@ export function UpdatesPage() {
       <header className="dev-header">
         <a className="dev-back" href="/">Hypersnap / Development</a>
         <p className="dev-eyebrow">A project in motion</p>
-        <h1>What’s changing.<br /><span>What it means.</span></h1>
-        <p className="dev-lede">A source-linked field guide to the work on Hypersnap. See what has landed in code, what is still being proposed, and what needs verification on an actual node.</p>
+        <h1>What’s new<br /><span>in Hypersnap?</span></h1>
+        <p className="dev-lede">Recent code changes, proposals and community discussions. Search below or choose the kind of update you want to read.</p>
         <div className="dev-meta">
           <span>Editorial check <time dateTime={development.checkedAt}>{development.checkedAt.slice(0, 10)} UTC</time></span>
           <a href={`https://github.com/farcasterorg/hypersnap/commit/${development.mainCommit}`} target="_blank" rel="noopener noreferrer">Reviewed main <code>{development.mainCommit.slice(0, 8)}</code> ↗</a>
         </div>
       </header>
 
-      <section className="dev-legend" aria-label="How to read these updates">
+      <details className="guide-disclosure"><summary>What do the update labels mean?</summary><section className="dev-legend" aria-label="How to read these updates">
         <div><span className="dev-badge dev-badge--merged">Merged source</span><p>Present in the reviewed upstream code. Not a deployment or correctness certificate.</p></div>
         <div><span className="dev-badge dev-badge--proposal">Open proposal</span><p>Under review. Consensus changes require coordinated adoption and activation.</p></div>
         <div><span className="dev-badge dev-badge--discussion">Discussion</span><p>A design conversation. Not a release schedule, adopted rule or reward promise.</p></div>
-      </section>
+      </section></details>
 
       <section className="dev-feed" aria-labelledby="developments-heading">
-        <div className="dev-section-heading"><div><p className="dev-eyebrow">Development log</p><h2 id="developments-heading">Follow the actual work.</h2></div><a className="dev-text-link" href="https://github.com/farcasterorg/hypersnap/pulls" target="_blank" rel="noopener noreferrer">All upstream pull requests <ArrowUpRight size={16} aria-hidden="true" /></a></div>
+        <div className="dev-section-heading"><div><p className="dev-eyebrow">Development log</p><h2 id="developments-heading">Latest updates.</h2></div><a className="dev-text-link" href="https://github.com/farcasterorg/hypersnap/pulls" target="_blank" rel="noopener noreferrer">All upstream pull requests <ArrowUpRight size={16} aria-hidden="true" /></a></div>
         <div className="dev-controls">
           <div className="dev-filters" role="group" aria-label="Filter developments by evidence level">
             {filters.map((item) => <button key={item.value} type="button" aria-pressed={filter === item.value} onClick={() => setFilter(item.value)}>{item.label}</button>)}

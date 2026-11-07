@@ -77,8 +77,8 @@ export function DocsIndexPage() {
     <>
       <PageHeader
         eyebrow="Docs"
-        title="Read the docs without leaving the site."
-        description="Every page here is rendered from the open source docs in farcasterorg/hypersnap-docs-web. The original repo is the source of truth — we mirror, link back, and keep things in sync."
+        title="Find your way around Hypersnap."
+        description="Understand the project, explore $SNAP, or start building. Choose a guide below, or browse the API reference."
       />
 
       <div className="mx-auto w-full max-w-6xl px-6 sm:px-8 lg:px-10">
@@ -107,14 +107,15 @@ export function DocsIndexPage() {
         </Reveal>
       </div>
 
-      <aside className="dev-note mx-auto max-w-6xl"><strong>Documentation ≠ deployment.</strong> These pages mirror upstream interfaces. Confirm network identity, node version, authentication and index completeness before relying on a route. <a href="/updates">Read current development and proposal status →</a></aside>
+      <aside className="dev-note mx-auto max-w-6xl">New here? <a href="/about">Start with What is Hypersnap?</a> · <a href="/snap">Read the $SNAP token guide</a></aside>
       <Section eyebrow="Paths" title="Pick the path that fits.">
-        <Stagger className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        <Stagger className="grid gap-5 sm:grid-cols-2">
+          <StaggerItem><PathCard icon={BookOpen} title="$SNAP token" body="A simple guide to the token, distribution claims and proposed rewards, with original sources." ctaLabel="Read the $SNAP guide" ctaHref="/snap" /></StaggerItem>
           <StaggerItem>
             <PathCard
               icon={Braces}
               title="Building an app"
-              body="Explore documented APIs for users, casts, feeds, reactions, search and integrations. Availability and completeness depend on the selected node, version and index readiness."
+              body="Start with users, posts, feeds and integrations. The reference explains the available requests."
               ctaLabel="Open API reference"
               ctaHref={resolveSectionEntry(sections, ["Read API reference", "Webhooks"])}
             />
@@ -140,7 +141,7 @@ export function DocsIndexPage() {
         </Stagger>
       </Section>
 
-      <Section eyebrow="Browse" title="All sections.">
+      <Section eyebrow="API documentation" title="Browse the reference." description="These pages mirror the upstream API docs. Support depends on the node and version you use.">
         <Reveal>
           <div className="grid gap-5 sm:grid-cols-2">
             {sections.map((section) => (
