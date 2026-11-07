@@ -2,20 +2,8 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { HomePage } from "@/components/pages/home-page";
 import { getNetworkStatus, getNodeHealthStatuses } from "@/lib/network";
-import { getSnapMarketData } from "@/lib/snap-market";
-
-const [snapMarket, networkStatus, networkNodes] = await Promise.all([
-  getSnapMarketData(),
-  getNetworkStatus(),
-  getNodeHealthStatuses(),
-]);
+const [networkStatus, networkNodes] = await Promise.all([getNetworkStatus(), getNodeHealthStatuses()]);
 ---
-
 <BaseLayout>
-  <HomePage
-    client:load
-    snapMarket={snapMarket}
-    networkStatus={networkStatus}
-    networkNodes={networkNodes}
-  />
+  <HomePage networkStatus={networkStatus} networkNodes={networkNodes} />
 </BaseLayout>

@@ -1,4 +1,4 @@
-import { SNAP, correctedSnapFdv } from "@/lib/snap";
+import { SNAP } from "@/lib/snap";
 
 export const SNAP_MARKET_REVALIDATE = 30;
 
@@ -49,6 +49,7 @@ export type SnapMarketResponse = {
   sourceUrl?: string;
   updatedAt?: string;
   error?: string;
+  attribution?: { provider: "Dexscreener"; scope: "External Ethereum listing"; protocolAdoption: "unverified"; supply: "unverified" };
   market?: {
     priceUsd: number | null;
     priceNative: number | null;
@@ -104,17 +105,17 @@ export async function getSnapMarketData(): Promise<SnapMarketResponse> {
     }
 
     const priceUsd = numberOrNull(pair.priceUsd);
-    const correctedFdv = priceUsd === null ? null : correctedSnapFdv(priceUsd);
+    if (priceUsd === null || priceUsd <= 0) throw new Error("Dexscreener response did not include a valid positive price");
+    // Preserve the response shape; never derive a valuation from unverified supply.
+    const correctedFdv: number | null = null;
     const dexscreenerFdv = numberOrNull(pair.fdv);
-    const fdvMultiple =
-      correctedFdv !== null && dexscreenerFdv !== null && dexscreenerFdv > 0
-        ? correctedFdv / dexscreenerFdv
-        : null;
+    const fdvMultiple = null;
     const h24Txns = pair.txns?.h24;
 
     return {
       ok: true,
-      sourceUrl: pair.url ?? SNAP.dexscreenerUrl,
+      sourceUrl: SNAP.dexscreenerUrl,
+      attribution: { provider: "Dexscreener", scope: "External Ethereum listing", protocolAdoption: "unverified", supply: "unverified" },
       updatedAt: new Date().toISOString(),
       market: {
         priceUsd,

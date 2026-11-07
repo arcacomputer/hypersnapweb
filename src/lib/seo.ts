@@ -3,7 +3,7 @@ import { creator } from "./creator";
 export const SITE_URL = "https://hypersnap.org";
 
 export const defaultDescription =
-  "Hypersnap is a decentralized social network portal made by Felirami, a solo developer contributing to the new Farcaster.";
+  "Open-source infrastructure for independent Farcaster clients. Explore Hypersnap development, public APIs, node operations and source-linked protocol research.";
 
 export const websiteStructuredData = {
   "@context": "https://schema.org",

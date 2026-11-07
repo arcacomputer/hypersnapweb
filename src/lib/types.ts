@@ -20,6 +20,7 @@ export type SourceRepo = {
   description: string;
   url: string;
   defaultBranch: string;
+  sourceCommit?: string;
   isEmpty: boolean;
   primaryLanguage: string | null;
   license: string | null;
@@ -55,6 +56,7 @@ export type SourceSnapshot = {
     createdAt: string;
   };
   sourceUpdatedAt: string;
+  collectedAt?: string;
   publicNode: {
     baseUrl: string;
     infoEndpoint: string;

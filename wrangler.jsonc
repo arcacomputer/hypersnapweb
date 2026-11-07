@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "hypersnap-web-canary",
+  "name": "hypersnap-web",
   "compatibility_date": "2026-09-02",
   "workers_dev": false,
   "preview_urls": false,

@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { getAllDocSlugs, sources } from "@/lib/sources";
 import { SITE_URL } from "@/lib/seo";
 
-const staticRoutes = ["", "/about", "/network", "/snap", "/run-a-node", "/docs", "/contribute"];
+const staticRoutes = ["", "/about", "/updates", "/network", "/snap", "/run-a-node", "/docs", "/contribute"];
 
 export const GET: APIRoute = () => {
   const lastmod = sources.sourceUpdatedAt;

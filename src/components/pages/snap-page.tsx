@@ -1,355 +1,166 @@
-import { Activity, AlertTriangle, GitBranch, GitPullRequest, Sparkles } from "lucide-react";
+import { BookOpen, GitPullRequest, Layers, ShieldCheck } from "lucide-react";
 import { InnerPageHero } from "@/components/hero/inner-page-hero";
-import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
-import { SnapMarketDashboard } from "@/components/snap-market-dashboard";
-import {
-  AccentCard,
-  CodeBlock,
-  InfoPanel,
-  LinkButton,
-  Section,
-  StatCard,
-  WarningPanel,
-} from "@/components/ui";
-import { SNAP, SNAP_PHASE_ONE_OPENED, SNAP_RETRO_ALLOCATION, SNAP_TOTAL_SUPPLY } from "@/lib/snap";
-const retroPercent = (SNAP_RETRO_ALLOCATION / SNAP_TOTAL_SUPPLY) * 100;
-const phaseOnePercentOfRetro = (SNAP_PHASE_ONE_OPENED / SNAP_RETRO_ALLOCATION) * 100;
-const phaseOnePercentOfSupply = (SNAP_PHASE_ONE_OPENED / SNAP_TOTAL_SUPPLY) * 100;
+import { Badge, InfoPanel, LinkButton, Section, WarningPanel } from "@/components/ui";
+import { SNAP } from "@/lib/snap";
 
-const supplyRows = [
-  { label: "Total supply", value: "200B", detail: "Known full supply used for true FDV." },
-  { label: "Retro rewards allocation", value: "200M", detail: `${retroPercent.toFixed(1)}% of total supply.` },
-  { label: "Phase 1 opened", value: "33M", detail: `${phaseOnePercentOfRetro.toFixed(1)}% of retro allocation; ${phaseOnePercentOfSupply.toFixed(3)}% of total supply.` },
-];
-
-const timeline = [
+const terms = [
   {
-    label: "Discussion",
-    title: "Token mechanics live in public FIPs",
-    body: "The design conversation is public in Farcasterorg discussions and linked PRs, including FIP-19 and related rollout work.",
+    title: "Snap embed",
+    body: "A beta server-driven JSON/component-rendering standard and SDK with signed interactions. It is an interactive content format, not a token or a reward contract.",
+    href: "https://github.com/farcasterorg/snap",
+    label: "Snap source",
   },
   {
-    label: "Claim",
-    title: "Retro rewards open in phases",
-    body: "The retro allocation is 200M $SNAP. Phase 1 opened 33M through Hypria for eligible contributors/participants.",
+    title: "Mini App",
+    body: "A hosted web app presented through a compatible host/webview, with SDK, wallet and authentication integrations. Availability depends on the host and its dependencies; it is not a Hypersnap node.",
+    href: "https://github.com/farcasterorg/miniapps/tree/1cef64ecad40e66d4de86cc50362235bf344cbcc",
+    label: "Mini Apps source",
   },
   {
-    label: "Market",
-    title: "The token trades on Ethereum",
-    body: "Dexscreener is used for live price, liquidity, volume, and transaction data. Hypersnap.org calculates true FDV from Dexscreener price × 200B supply.",
+    title: "Snap Compute",
+    body: "A proposal for opt-in deterministic execution/replay and capabilities. It is distinct from current server-driven Snaps and is not proof of a deployed compute or reward network.",
+    href: "https://github.com/orgs/farcasterorg/discussions/21",
+    label: "Discussion #21",
+  },
+  {
+    title: "SNAP ticker",
+    body: "A symbol displayed by external Ethereum token/market listings. A shared name does not establish issuer authority, a native protocol asset, reward eligibility or governance adoption.",
+    href: SNAP.explorerUrl,
+    label: "External explorer listing",
   },
 ];
 
-const quickFacts = [
-  ["Chain", "Ethereum"],
-  ["Claim", "Hypria"],
-  ["Pair", "Uniswap v4"],
-];
-
-export function SnapPage({ snapMarket }: { snapMarket?: import("@/lib/snap-market").SnapMarketResponse }) {
+export function SnapPage() {
   return (
     <>
       <InnerPageHero
         accent="amber"
-        eyebrow="$SNAP"
-        title="Market data, supply math, and the public source trail."
-        description="Dexscreener is useful for price, liquidity, and volume. Its FDV is not the source of truth here. Hypersnap.org calculates true FDV from the live Dexscreener price multiplied by the known 200B $SNAP supply."
+        eyebrow="Economics · public research"
+        title="Follow the evidence, not a reward promise."
+        description="Protocol reward mechanisms remain under public development. Proposals explore data availability, application usage and social contribution. Eligibility, parameters and activation require an adopted release; separate Ethereum listings and claimed distributions need their own provenance."
         actions={[
-          { href: SNAP.claimUrl, label: "Claim on Hypria", external: true },
-          { href: SNAP.dexscreenerUrl, label: "View Dexscreener", external: true, variant: "secondary" },
+          { href: "#research", label: "Read the research" },
+          { href: "#evidence", label: "Understand the evidence", variant: "secondary" },
         ]}
         aside={
           <div className="glass-panel rounded-2xl p-6">
-            <p className="text-sm uppercase tracking-[0.14em] text-slate-500">Token card</p>
-            <div className="mt-5 grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-              {quickFacts.map(([label, value]) => (
-                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4" key={label}>
-                  <p className="text-xs uppercase tracking-[0.12em] text-slate-500">{label}</p>
-                  <p className="mt-2 font-mono text-lg text-white">{value}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 rounded-xl border border-cyan-400/15 bg-cyan-400/[0.04] p-4">
-              <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Contract</p>
-              <p className="mt-2 break-all font-mono text-sm leading-6 text-cyan-100/90">{SNAP.contract}</p>
-            </div>
-            <p className="mt-4 text-xs leading-5 text-slate-500">
-              Verify the contract before claiming or trading. This page is informational, not financial advice.
+            <Badge>Source status · November 7, 2026</Badge>
+            <h2 className="mt-5 text-xl font-semibold text-white">Proposal ≠ activation</h2>
+            <p className="mt-4 text-sm leading-7 text-slate-300">
+              Public discussion, open implementation, main source, release and verified deployment
+              are separate evidence stages. Tokenization PRs #13 and #34 remained open/unmerged
+              at this check.
+            </p>
+            <p className="mt-4 text-xs leading-6 text-slate-400">
+              Checked <time dateTime={SNAP.checkedAt}>November 7, 2026 at 07:56 UTC</time>.
+              Source-status research only; no wallet, distribution, bridge or deployed reward verification.
             </p>
           </div>
         }
       />
 
-      <Section eyebrow="Market" title="Live market data with true FDV.">
-        <Reveal>
-          <SnapMarketDashboard initialData={snapMarket} />
-        </Reveal>
+      <Section id="evidence" eyebrow="Evidence boundaries" title="What the sources do—and do not—establish.">
+        <div className="grid gap-5 lg:grid-cols-2">
+          <InfoPanel icon={BookOpen} title="Contribution markets are a proposal">
+            <p>
+              <a className="text-cyan-100 underline" href="https://github.com/orgs/farcasterorg/discussions/19">Discussion #19</a>{" "}
+              explores contribution work markets for data availability, growth and application
+              activity. A maintainer&apos;s{" "}
+              <a className="text-cyan-100 underline" href="https://github.com/farcasterorg/protocol/discussions/19#discussioncomment-19342869">November 2 reply</a>{" "}
+              intends usage-attributed rewards for full-client developers. Neither establishes a
+              currently payable entitlement or a guaranteed return for operating a node.
+            </p>
+          </InfoPanel>
+          <InfoPanel icon={ShieldCheck} title="Attribute distribution claims">
+            <p>
+              Discussion #19&apos;s author claims completed Ethereum retro distribution/vesting and
+              a future same-asset bridge into Hypersnap. Those are attributed claims, not outcomes
+              independently verified here. It would be inaccurate either to assert that no token
+              exists or to present this listing as the adopted native protocol asset.
+            </p>
+          </InfoPanel>
+        </div>
+        <div className="mt-6">
+          <WarningPanel>
+            <p>
+              No rewards, eligibility, earnings or launch date are promised. Registration hashcash
+              in open <a className="text-cyan-100 underline" href="https://github.com/farcasterorg/hypersnap/pull/63">PR #63</a>{" "}
+              is an onboarding anti-abuse mechanism, not the contribution-reward work-market design.
+              Open code, a traded ticker or a proposal is not activation evidence.
+            </p>
+          </WarningPanel>
+        </div>
       </Section>
 
-      <Section
-        eyebrow="Supply"
-        title="The core numbers are simple."
-        description="Supply, retro rewards, and claim phases are different concepts. Mixing them together is how indexer fog turns into misinformation."
-      >
-        <Reveal>
-          <div className="grid gap-5 md:grid-cols-3">
-            {supplyRows.map((row) => (
-              <StatCard detail={row.detail} key={row.label} label={row.label} value={row.value} />
-            ))}
-          </div>
-          <div className="mt-8 grid gap-6 lg:grid-cols-2">
-            <SupplyChartCard
-              accent="amber"
-              percent={retroPercent}
-              title="Retro allocation: 0.1% of supply"
-              eyebrow="Total supply view"
-              body="200M $SNAP is allocated to retro rewards out of 200B total supply. The visible slice is intentionally tiny because the allocation is tiny relative to total supply."
-              legend={[
-                ["Retro rewards allocation", "200M", retroPercent, "amber"],
-                ["Rest of supply", "199.8B", 100 - retroPercent, "muted"],
-              ]}
-            />
-            <SupplyChartCard
-              accent="cyan"
-              percent={phaseOnePercentOfRetro}
-              title="Phase 1 opened 16.5% of retro rewards"
-              eyebrow="Retro rewards view"
-              body="33M $SNAP opened in Phase 1. The remaining 167M retro allocation is not the same thing as circulating supply or total supply."
-              legend={[
-                ["Phase 1 opened", "33M", phaseOnePercentOfRetro, "cyan"],
-                ["Remaining retro allocation", "167M", 100 - phaseOnePercentOfRetro, "muted"],
-              ]}
-            />
-          </div>
-        </Reveal>
-      </Section>
-
-      <Section
-        eyebrow="How it works"
-        title="$SNAP connects contribution, claims, and market data."
-        description="Three layers. Keep them separate and the token story becomes much easier to understand."
-      >
-        <Stagger className="grid gap-5 md:grid-cols-3">
-          <StaggerItem>
-            <InfoPanel icon={GitBranch} title="1. Protocol discussion">
-              <p>
-                Token design and incentive mechanics are discussed in public Farcasterorg FIPs and implementation PRs.
-              </p>
-            </InfoPanel>
-          </StaggerItem>
-          <StaggerItem>
-            <InfoPanel icon={Sparkles} title="2. Retro rewards">
-              <p>
-                Retro rewards are a limited allocation for past/proven contribution. Phase 1 opened 33M of the 200M retro bucket through Hypria.
-              </p>
-            </InfoPanel>
-          </StaggerItem>
-          <StaggerItem>
-            <InfoPanel icon={Activity} title="3. Market trading">
-              <p>
-                Market price, liquidity, volume, and transactions come from the live Ethereum pool. True FDV here is calculated from Dexscreener price × 200B supply.
-              </p>
-            </InfoPanel>
-          </StaggerItem>
-        </Stagger>
-        <Reveal>
-          <div className="mt-8">
-            <WarningPanel>
-              <div className="flex gap-3">
-                <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" aria-hidden="true" />
-                <p>
-                  This page is informational. It is not financial advice, not a promise of rewards, and not a recommendation to buy or sell $SNAP. Verify contract addresses and eligibility before doing anything with money.
-                </p>
-              </div>
-            </WarningPanel>
-          </div>
-        </Reveal>
-      </Section>
-
-      <Section eyebrow="Claim and verify" title="Use the contract address, not vibes.">
-        <Reveal>
-          <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
-            <AccentCard>
-              <p className="text-sm uppercase tracking-[0.14em] text-slate-500">Contract</p>
-              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-white">$SNAP on Ethereum</h2>
-              <p className="mt-4 text-sm leading-7 text-slate-400">
-                Always verify the contract before claiming, trading, or sharing a link. The official claim flow currently lives at Hypria.
-              </p>
-              <div className="mt-6">
-                <CodeBlock label="$SNAP contract" command={SNAP.contract} />
-              </div>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <LinkButton href={SNAP.claimUrl} external>
-                  Claim on Hypria
-                </LinkButton>
-                <LinkButton href={SNAP.dexscreenerUrl} variant="secondary" external>
-                  View Dexscreener
-                </LinkButton>
-              </div>
-            </AccentCard>
-            <div className="grid gap-4">
-              {timeline.map((item, index) => (
-                <div className="glass-panel rounded-2xl p-6" key={item.label}>
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full border border-cyan-400/20 bg-cyan-400/[0.06] font-mono text-sm text-cyan-200">
-                      {index + 1}
-                    </span>
-                    <p className="text-xs uppercase tracking-[0.12em] text-slate-500">{item.label}</p>
-                  </div>
-                  <h3 className="mt-4 text-lg font-semibold text-white">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-7 text-slate-400">{item.body}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Reveal>
-      </Section>
-
-      <Section
-        eyebrow="Source trail"
-        title="Where the discussion lives."
-        description="The useful token conversation is not hidden in a private Telegram. Start with these public links."
-      >
-        <Stagger className="grid gap-5 md:grid-cols-3">
+      <Section id="research" eyebrow="Source trail" title="Read the competing designs."
+        description="Each entry carries its evidence level. Discussion and PR statuses were checked November 7, 2026; this is not an adoption or deployment checklist.">
+        <div className="grid gap-5 md:grid-cols-2">
           {SNAP.discussions.map((discussion) => (
-            <StaggerItem key={discussion.href}>
-              <InfoPanel icon={GitPullRequest} title={discussion.label}>
-                <p className="mb-4">{discussion.description}</p>
-                <LinkButton href={discussion.href} variant="secondary" external>
-                  Open source thread
-                </LinkButton>
-              </InfoPanel>
-            </StaggerItem>
+            <InfoPanel icon={GitPullRequest} title={discussion.label} key={discussion.href}>
+              <Badge>{discussion.evidence}</Badge>
+              <p className="mt-4">{discussion.description}</p>
+              <p className="mt-3 text-xs text-slate-400">Checked November 7, 2026</p>
+              <div className="mt-5">
+                <LinkButton href={discussion.href} variant="secondary" external>Read the source</LinkButton>
+              </div>
+            </InfoPanel>
           ))}
-        </Stagger>
+        </div>
       </Section>
-    </>
-  );
-}
 
-function SupplyChartCard({
-  accent,
-  percent,
-  eyebrow,
-  title,
-  body,
-  legend,
-}: {
-  accent: "amber" | "cyan";
-  percent: number;
-  eyebrow: string;
-  title: string;
-  body: string;
-  legend: [string, string, number, "amber" | "cyan" | "muted"][];
-}) {
-  const accentColor = accent === "amber" ? "#fbbf24" : "#38bdf8";
-  const accentGlow = accent === "amber" ? "rgba(251,191,36,0.35)" : "rgba(56,189,248,0.35)";
+      <Section id="names" eyebrow="Four different things" title="Snap is not one product or asset."
+        description="Interactive embeds, hosted apps, proposed execution and a market ticker have different purposes and evidence requirements.">
+        <div className="grid gap-5 md:grid-cols-2">
+          {terms.map((term) => (
+            <InfoPanel icon={Layers} title={term.title} key={term.title}>
+              <p>{term.body}</p>
+              <p className="mt-3 text-xs text-slate-400">{term.title === "Snap Compute" ? "Proposal" : term.title === "SNAP ticker" ? "External listing; provenance unresolved" : "Source documentation"} · checked November 7, 2026</p>
+              <div className="mt-5">
+                <LinkButton href={term.href} variant="secondary" external>{term.label}</LinkButton>
+              </div>
+            </InfoPanel>
+          ))}
+        </div>
+      </Section>
 
-  return (
-    <div className="glass-panel overflow-hidden rounded-2xl p-7 sm:p-8">
-      <p className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">{eyebrow}</p>
-
-      <div className="mt-8 flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-10">
-        <div className="relative mx-auto shrink-0 lg:mx-0">
-          <DonutChart accentColor={accentColor} accentGlow={accentGlow} percent={percent} />
-          <p className="mt-4 text-center text-xs text-slate-500 lg:text-left">
-            {percent < 1 ? "Relative to total supply" : "Of retro allocation"}
+      <Section id="external-listing" eyebrow="Separate evidence category" title="An external listing is not protocol economics."
+        description="The existing Ethereum identifier is retained for transparent provenance and market-endpoint compatibility—not as an official-issuer endorsement.">
+        <div className="glass-panel rounded-2xl p-6 sm:p-8">
+          <Badge>External listing · unverified protocol relationship</Badge>
+          <p className="mt-5 text-sm leading-7 text-slate-300">
+            Etherscan displayed a token labeled Hypersnap (SNAP) at the address below. An explorer&apos;s
+            supply display does not establish a lifetime cap, bridge supply, issuer authority or
+            protocol adoption. The reviewed primary sources do not substantiate the former site&apos;s
+            total-supply, allocation or claim-phase figures, so no supply chart or derived FDV is presented.
+            An unrelated draft&apos;s parameters are not a replacement.
+          </p>
+          <p className="mt-5 text-xs uppercase tracking-[0.12em] text-slate-400">Listed Ethereum address · checked November 7, 2026</p>
+          <p className="mt-2 break-all font-mono text-sm leading-7 text-cyan-100">{SNAP.contract}</p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <LinkButton href={SNAP.explorerUrl} variant="secondary" external>Inspect explorer record</LinkButton>
+          </div>
+          <p className="mt-5 text-sm leading-7 text-slate-400">
+            The existing <code>/api/snap-market</code> endpoint remains an external Dexscreener feed;
+            its legacy calculated-FDV fields are unavailable without verified supply. This research
+            page does not load a market widget, connect a wallet or direct visitors to a claim flow.
           </p>
         </div>
+      </Section>
 
-        <div className="min-w-0 flex-1">
-          <h3 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">{title}</h3>
-          <p className="mt-3 text-sm leading-7 text-slate-400">{body}</p>
-
-          <div className="mt-6 space-y-3">
-            {legend.map(([label, value, share, tone]) => (
-              <LegendRow key={label} label={label} share={share} tone={tone} value={value} />
-            ))}
+      <Section id="open-questions" eyebrow="Before adoption" title="What still needs evidence?">
+        <div className="glass-panel rounded-2xl p-6 sm:p-8">
+          <ul className="list-disc space-y-3 pl-5 text-sm leading-7 text-slate-300">
+            <li>Issuer/governance provenance linking any external asset to adopted protocol economics.</li>
+            <li>Verified supply accounting, distribution receipts, bridge design and custody/security assumptions.</li>
+            <li>Adopted eligibility, app attribution, anti-abuse rules and reward parameters—not just intended coverage.</li>
+            <li>A reviewed implementation, release/activation decision and independently observed deployment.</li>
+          </ul>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <LinkButton href="https://github.com/orgs/farcasterorg/discussions" external>Join the discussion</LinkButton>
+            <LinkButton href="/run-a-node#verify" variant="secondary">Operator verification</LinkButton>
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function DonutChart({
-  percent,
-  accentColor,
-  accentGlow,
-}: {
-  percent: number;
-  accentColor: string;
-  accentGlow: string;
-}) {
-  const radius = 38;
-  const stroke = 7;
-  const circumference = 2 * Math.PI * radius;
-  const displayPercent = Math.min(Math.max(percent, 0), 100);
-  const filled = (displayPercent / 100) * circumference;
-  const label = displayPercent < 1 ? displayPercent.toFixed(2) : displayPercent.toFixed(1);
-
-  return (
-    <div className="relative h-44 w-44">
-      <svg aria-hidden="true" className="h-full w-full -rotate-90" viewBox="0 0 100 100">
-        <circle
-          cx="50"
-          cy="50"
-          fill="none"
-          r={radius}
-          stroke="rgba(255,255,255,0.08)"
-          strokeWidth={stroke}
-        />
-        <circle
-          cx="50"
-          cy="50"
-          fill="none"
-          r={radius}
-          stroke={accentColor}
-          strokeDasharray={`${filled} ${circumference - filled}`}
-          strokeLinecap="round"
-          strokeWidth={stroke}
-          style={{ filter: `drop-shadow(0 0 10px ${accentGlow})` }}
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="font-mono text-3xl font-semibold tracking-tight text-white">{label}%</span>
-        <span className="mt-1 text-[0.65rem] uppercase tracking-[0.14em] text-slate-500">allocated</span>
-      </div>
-    </div>
-  );
-}
-
-function LegendRow({
-  label,
-  value,
-  share,
-  tone,
-}: {
-  label: string;
-  value: string;
-  share: number;
-  tone: "amber" | "cyan" | "muted";
-}) {
-  const barColor =
-    tone === "amber" ? "bg-amber-400" : tone === "cyan" ? "bg-cyan-400" : "bg-white/20";
-  const dotColor =
-    tone === "amber" ? "bg-amber-400" : tone === "cyan" ? "bg-cyan-400" : "bg-white/30";
-
-  return (
-    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-      <div className="flex items-center justify-between gap-3">
-        <span className="flex min-w-0 items-center gap-2.5 text-sm text-slate-300">
-          <span className={`h-2 w-2 shrink-0 rounded-full ${dotColor}`} aria-hidden="true" />
-          <span className="truncate">{label}</span>
-        </span>
-        <span className="shrink-0 font-mono text-sm text-white">{value}</span>
-      </div>
-      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
-        <div
-          className={`h-full rounded-full transition-all duration-700 ${barColor}`}
-          style={{ width: `${Math.min(Math.max(share, 0.5), 100)}%` }}
-        />
-      </div>
-    </div>
+      </Section>
+    </>
   );
 }

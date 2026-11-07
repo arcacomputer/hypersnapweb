@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { NetworkPage } from "@/components/pages/network-page";
+import { sources } from "@/lib/sources";
 import { getNetworkStatus, getNodeHealthStatuses } from "@/lib/network";
 
 const [status, nodes] = await Promise.all([getNetworkStatus(), getNodeHealthStatuses()]);
@@ -8,7 +9,7 @@ const [status, nodes] = await Promise.all([getNetworkStatus(), getNodeHealthStat
 
 <BaseLayout
   title="Network"
-  description="Access Hypersnap public nodes, Ardea / Arca node status, HTTP API endpoints, and shard data."
+  description="Selected public endpoint observations, reported shard data and independent operator aggregate telemetry. Availability is not full network or application readiness."
 >
-  <NetworkPage client:load status={status} nodes={nodes} />
+  <NetworkPage client:load status={status} nodes={nodes} publicNode={sources.publicNode} />
 </BaseLayout>

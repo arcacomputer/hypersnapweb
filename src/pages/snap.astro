@@ -1,14 +1,11 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { SnapPage } from "@/components/pages/snap-page";
-import { getSnapMarketData } from "@/lib/snap-market";
-
-const snapMarket = await getSnapMarketData();
 ---
 
 <BaseLayout
-  title="$SNAP"
-  description="$SNAP token information for Hypersnap: live market data, true FDV, retro rewards, claim links, contract details, and public discussions."
+  title="Economics research"
+  description="Source-linked Hypersnap economics research: contribution proposals, open implementation, attributed distribution claims and unresolved token provenance. No reward or eligibility promises."
 >
-  <SnapPage client:load snapMarket={snapMarket} />
+  <SnapPage />
 </BaseLayout>

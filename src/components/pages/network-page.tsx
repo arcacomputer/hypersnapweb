@@ -1,110 +1,54 @@
-import { Activity, Braces, Clock, Database, RadioTower } from "lucide-react";
+import { Activity, Braces, RadioTower } from "lucide-react";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
 import { NetworkStatusGrid } from "@/components/network-status";
-import {
-  CodeBlock,
-  InfoPanel,
-  PageHeader,
-  Section,
-  ShardCard,
-  StatCard,
-  WarningPanel,
-} from "@/components/ui";
-import { formatBytes, formatExactNumber } from "@/lib/format";
-import { sources } from "@/lib/sources";
-import type { NetworkStatus, NodeHealthStatus } from "@/lib/types";
+import { CodeBlock, InfoPanel, PageHeader, Section } from "@/components/ui";
+import type { NetworkStatus, NodeHealthStatus, SourceSnapshot } from "@/lib/types";
 
-export function NetworkPage({
-  status,
-  nodes,
-}: {
-  status: NetworkStatus;
-  nodes?: NodeHealthStatus[];
-}) {
-  const shards = status.info?.shardInfos ?? [];
-
+export function NetworkPage({ status, nodes, publicNode }: { status: NetworkStatus; nodes?: NodeHealthStatus[]; publicNode: SourceSnapshot["publicNode"] }) {
   return (
     <>
       <PageHeader
         eyebrow="Network access"
-        title="Live Hypersnap nodes, not vibes."
-        description="A builder/operator view of the public Hypersnap node, Ardea's Arca-run node, and nearby Farcaster hub endpoints. Public node stats refresh every minute; hosted hub providers that require credentials are marked auth gated instead of being misreported as dead."
+        title="Public endpoints, measured honestly."
+        description="Read-only observations of the public Hypersnap endpoint and selected Farcaster hub providers. Endpoint availability is not proof of archive completeness, consensus, fork agreement, or application readiness."
       />
-
       <Section
-        title="Current public node status"
-        description={`Primary status is read from ${sources.publicNode.baseUrl}${sources.publicNode.infoEndpoint}; the endpoint grid also probes Ardea and known Farcaster hub providers.`}
+        title="Public endpoint observations"
+        description={`Primary info comes from ${publicNode.baseUrl}${publicNode.infoEndpoint}. The view refreshes on arrival and every minute while visible; failed refreshes leave earlier observations explicitly stale.`}
       >
-        <Reveal>
-          <NetworkStatusGrid compact initialStatus={status} initialNodes={nodes} />
-        </Reveal>
+        <Reveal><NetworkStatusGrid initialStatus={status} initialNodes={nodes} /></Reveal>
       </Section>
-
       <Section
-        eyebrow="Endpoints"
-        title="Four practical ways to talk to the network."
-        description="Start with the public HTTP API for reads. Use /v1/info for node health. Use Ardea's operator site when you want the Arca-run node context, and port 3381 when you want raw node JSON."
+        eyebrow="Access"
+        title="Choose the right surface."
+        description="Use the public endpoint for reads. Independent operator telemetry describes only that operator, not the entire network. Keep your own raw HTTP and gRPC listeners private or authenticated."
       >
         <Stagger className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           <StaggerItem>
-            <InfoPanel icon={Braces} title="HTTP API">
-              <p className="mb-4">Public read endpoints live under the Farcaster v2-compatible prefix.</p>
-              <CodeBlock label="Base URL" command={`${sources.publicNode.baseUrl}${sources.publicNode.apiPrefix}`} />
+            <InfoPanel icon={Braces} title="Public HTTP API">
+              <p className="mb-4">Public read endpoints use the Farcaster v2-compatible prefix; availability does not qualify every API or historical result.</p>
+              <CodeBlock label="Base URL" command={`${publicNode.baseUrl}${publicNode.apiPrefix}`} />
             </InfoPanel>
           </StaggerItem>
           <StaggerItem>
             <InfoPanel icon={RadioTower} title="Primary node info">
-              <p className="mb-4">Health, shard heights, message counts, peer ID, and release version.</p>
-              <CodeBlock label="Info endpoint" command={`curl ${sources.publicNode.baseUrl}${sources.publicNode.infoEndpoint} | jq .`} />
+              <p className="mb-4">Reported version, shard heights, and any available counters. Missing fields are unknown, not zero.</p>
+              <CodeBlock label="Info endpoint" command={`curl ${publicNode.baseUrl}${publicNode.infoEndpoint} | jq .`} />
             </InfoPanel>
           </StaggerItem>
           <StaggerItem>
-            <InfoPanel icon={RadioTower} title="Ardea / Arca node">
-              <p className="mb-4">Ardea is the Arca-run Hypersnap node. The site lives at ardea.arcabot.ai; the node API is exposed on port 3381.</p>
-              <CodeBlock label="Ardea status" command="curl http://209.97.147.208:3381/v1/info | jq ." />
+            <InfoPanel icon={RadioTower} title="Independent operator telemetry">
+              <p className="mb-4">Arca operator aggregate telemetry separates chain progress from archive and application readiness. It is not a public raw-node API or network-wide measurement.</p>
+              <a className="text-cyan-200 underline" href="https://stats.opencaster.org" target="_blank" rel="noreferrer">stats.opencaster.org ↗</a>
             </InfoPanel>
           </StaggerItem>
           <StaggerItem>
-            <InfoPanel icon={Activity} title="Local node">
-              <p className="mb-4">Self-hosted nodes expose the same HTTP listener on port 3381 by default.</p>
+            <InfoPanel icon={Activity} title="Private local node">
+              <p className="mb-4">Inspect your own listener locally. Protect HTTP 3381/tcp and gRPC 3383/tcp; peer gossip uses 3382/udp.</p>
               <CodeBlock label="Local status" command="curl http://localhost:3381/v1/info | jq ." />
             </InfoPanel>
           </StaggerItem>
         </Stagger>
-      </Section>
-
-      <Section eyebrow="Shard view" title="The live node reports the current sync surface.">
-        <Reveal>
-          <div className="grid gap-5 md:grid-cols-3">
-            {shards.map((shard) => (
-              <ShardCard
-                approxSize={formatBytes(shard.approxSize)}
-                blockDelay={formatExactNumber(shard.blockDelay ?? 0)}
-                key={shard.shardId}
-                maxHeight={formatExactNumber(shard.maxHeight)}
-                numMessages={formatExactNumber(shard.numMessages)}
-                shardId={shard.shardId}
-              />
-            ))}
-            {shards.length === 0 ? (
-              <WarningPanel>
-                The public node did not return shard data during this request. The API route will keep
-                returning a clear degraded state until the node responds again.
-              </WarningPanel>
-            ) : null}
-          </div>
-        </Reveal>
-      </Section>
-
-      <Section eyebrow="Data profile" title="What the public node is indexing right now.">
-        <Reveal>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard icon={Database} label="Database size" value={formatBytes(status.info?.dbStats?.approxSize)} />
-            <StatCard icon={Database} label="Messages" value={formatExactNumber(status.info?.dbStats?.numMessages)} />
-            <StatCard icon={RadioTower} label="FIDs" value={formatExactNumber(status.info?.dbStats?.numFidRegistrations)} />
-            <StatCard icon={Clock} label="Checked" value={status.ok ? "Fresh" : "Degraded"} detail={status.error} />
-          </div>
-        </Reveal>
       </Section>
     </>
   );

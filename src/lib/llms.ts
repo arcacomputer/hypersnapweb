@@ -8,7 +8,7 @@ export function renderLlmsIndex() {
   lines.push("# Hypersnap");
   lines.push("");
   lines.push(
-    "> Hypersnap is a decentralized social network — the evolution of Farcaster, built by a global community of contributors. No company, no VC. Same wire format and identities as Farcaster, but every node is run by someone different.",
+    "> Hypersnap develops open-source node infrastructure and APIs for independent Farcaster clients. Shared formats do not guarantee complete feature or deployment parity. See /updates for dated source evidence and proposal status.",
   );
   lines.push("");
   lines.push("## About this index");
@@ -30,10 +30,12 @@ export function renderLlmsIndex() {
     lines.push("");
   }
 
+  lines.push(`Editorial evidence: ${SITE_URL}/updates (merged source, proposals and deployment are separate).`);
+  lines.push(`Economics research: ${SITE_URL}/snap (no guaranteed rewards; external token provenance is separate).`);
   lines.push("## Project surfaces");
   lines.push("");
   lines.push(`- [About Hypersnap](${SITE_URL}/about): What it is, why it exists, who builds it.`);
-  lines.push(`- [Live network status](${SITE_URL}/network): Public node, endpoints, shard data.`);
+  lines.push(`- [Selected public endpoint observations](${SITE_URL}/network): Public node, endpoints, shard data.`);
   lines.push(
     `- [Run a node](${SITE_URL}/run-a-node): Bootstrap, operator toolkit, doctor command, and runbook for node operators.`,
   );
@@ -56,7 +58,7 @@ export function renderLlmsFull() {
   parts.push("# Hypersnap — Full documentation");
   parts.push("");
   parts.push(
-    "Hypersnap is a decentralized social network built by a global community of contributors. No company, no VC. The evolution of Farcaster: same wire format and identities, but every node is run by someone different.",
+    "Hypersnap develops open-source node infrastructure and APIs for independent Farcaster clients. Documentation describes interfaces, not verified availability on every node. Merged source, releases, activation and application correctness require separate evidence.",
   );
   parts.push("");
   parts.push(`Source repository: ${sources.organization.url}/hypersnap-docs-web`);

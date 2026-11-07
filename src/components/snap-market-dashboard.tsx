@@ -125,11 +125,11 @@ export function SnapMarketDashboard({
           <p className="text-xs text-slate-400">{loading ? "Updating…" : formatTime(data?.updatedAt)}</p>
         </div>
         {data?.ok === false ? (
-          <p className="mt-4 text-sm leading-6 text-slate-300">Market feed is temporarily unavailable. Static supply data remains valid.</p>
+          <p className="mt-4 text-sm leading-6 text-slate-300">Market feed is temporarily unavailable. Supply and protocol adoption remain unverified.</p>
         ) : (
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
             <Metric label="Price" value={loading ? "…" : formatUsd(market?.priceUsd)} tone="cyan" />
-            <Metric label="True FDV" value={loading ? "…" : formatUsd(trueFdv, true)} detail="Dex price × 200B" tone="amber" />
+            <Metric label="Derived FDV" value={loading ? "…" : formatUsd(trueFdv, true)} detail="Unavailable without verified supply" tone="amber" />
             <Metric label="Liquidity" value={loading ? "…" : formatUsd(market?.liquidityUsd, true)} />
           </div>
         )}
@@ -148,7 +148,7 @@ export function SnapMarketDashboard({
             </div>
             <h2 className="mt-3 text-2xl font-semibold text-white">Market snapshot</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
-              Price, liquidity, volume, and transaction counts come from Dexscreener. True FDV is recalculated here from Dexscreener price × 200B supply.
+              Price, liquidity, volume, and transaction counts come from Dexscreener. This external listing does not establish issuer authority or adopted protocol economics; derived FDV is withheld without verified supply.
             </p>
           </div>
           <p className="rounded-full border border-white/10 bg-slate-950/45 px-3 py-1 text-xs text-slate-300">
@@ -174,9 +174,9 @@ export function SnapMarketDashboard({
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Metric label="True FDV" value={loading ? "…" : formatUsd(trueFdv, true)} detail="Dexscreener price × 200B supply" tone="amber" />
+              <Metric label="Derived FDV" value={loading ? "…" : formatUsd(trueFdv, true)} detail="Unavailable without verified supply" tone="amber" />
               <Metric label="Dexscreener FDV" value={loading ? "…" : formatUsd(market?.dexscreenerFdv, true)} detail="Indexer-reported value, shown for comparison." tone="danger" />
-              <Metric label="Indexer gap" value={loading ? "…" : fdvGap} detail="How far the true FDV is above Dexscreener's reported FDV." />
+              <Metric label="Indexer gap" value={loading ? "…" : fdvGap} detail="Unavailable without verified supply; provider FDV is an attributed observation only." />
               <Metric label="Liquidity" value={loading ? "…" : formatUsd(market?.liquidityUsd, true)} detail={`${formatNumber(market?.liquiditySnap)} SNAP / ${formatNumber(market?.liquidityEth, false)} ETH`} />
             </div>
           </div>

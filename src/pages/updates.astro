@@ -1,0 +1,7 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { UpdatesPage } from "@/components/pages/updates-page";
+---
+<BaseLayout title="Development" description="What is changing in Hypersnap: merged source, open proposals, protocol discussions and the evidence behind each update.">
+  <UpdatesPage client:load />
+</BaseLayout>

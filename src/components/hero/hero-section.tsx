@@ -1,77 +1,61 @@
-import { HeroBackground } from "@/components/hero-background";
-import { Badge, LinkButton } from "@/components/ui";
-
-const heroStats = [
-  { label: "Protocol", value: "Farcaster-compatible" },
-  { label: "Governance", value: "Community-owned" },
-  { label: "Status", value: "Live on mainnet" },
-];
+import { ArrowRight, ArrowUpRight, GitCommitHorizontal } from "lucide-react";
+import { development } from "@/data/development";
 
 export function HeroSection() {
+  const checkedDate = new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(development.checkedAt));
+
   return (
-    <section className="relative isolate overflow-hidden border-b border-white/[0.06]">
-      <HeroBackground />
-
-      <div className="relative mx-auto flex min-h-[88svh] w-full max-w-6xl flex-col justify-center px-6 py-24 sm:px-8 sm:py-28 lg:min-h-[92svh] lg:px-10 lg:py-32">
-        <div className="fade-in-up">
-          <Badge>Decentralized protocol · Open source · No single owner</Badge>
+    <section className="hs-hero" aria-labelledby="hs-hero-title">
+      <div className="hs-container hs-hero-layout">
+        <div className="hs-hero-copy">
+          <p className="hs-eyebrow"><span className="hs-mark" aria-hidden="true" /> The Hypersnap project</p>
+          <h1 id="hs-hero-title">An open future<br />for <span>Farcaster.</span></h1>
+          <p className="hs-hero-lead">Open social infrastructure, built in public.</p>
+          <p className="hs-hero-description">
+            A community fork effort exploring a more open Farcaster. Follow the code,
+            read from public endpoints, and help shape what comes next.
+          </p>
+          <div className="hs-actions">
+            <a className="hs-button hs-button-primary" href="/updates">
+              What’s new <ArrowRight aria-hidden="true" />
+            </a>
+            <a className="hs-button hs-button-secondary" href="/docs">
+              Build with Hypersnap <ArrowUpRight aria-hidden="true" />
+            </a>
+          </div>
+          <a className="hs-text-link hs-operator-link" href="/run-a-node">
+            Here to run a node? Start with the operator guide <ArrowRight aria-hidden="true" />
+          </a>
         </div>
 
-        <h1
-          className="fade-in-up mt-10 max-w-4xl text-balance text-[clamp(3rem,8vw,6.5rem)] font-semibold leading-[0.95] tracking-[-0.03em]"
-          style={{ animationDelay: "0.08s" }}
-        >
-          <span className="text-gradient-hero">Hypersnap</span>
-        </h1>
-
-        <p
-          className="fade-in-up mt-8 max-w-2xl text-pretty text-xl font-medium leading-snug text-white/90 sm:text-2xl sm:leading-tight"
-          style={{ animationDelay: "0.16s" }}
-        >
-          A decentralized social network — actually decentralized.
-        </p>
-
-        <p
-          className="fade-in-up mt-6 max-w-xl text-pretty text-base leading-7 text-slate-400 sm:text-lg sm:leading-8"
-          style={{ animationDelay: "0.24s" }}
-        >
-          The evolution of Farcaster. Same posts, follows, and identities — but every node is run
-          by someone different, anywhere in the world.
-        </p>
-
-        <div
-          className="fade-in-up mt-12 flex flex-wrap items-center gap-4"
-          style={{ animationDelay: "0.32s" }}
-        >
-          <LinkButton href="/about">What is Hypersnap?</LinkButton>
-          <LinkButton href="/run-a-node" variant="secondary">
-            Run a node
-          </LinkButton>
-          <LinkButton href="/contribute" variant="secondary">
-            Help build it
-          </LinkButton>
-        </div>
-
-        <div
-          className="fade-in-up mt-20 flex flex-wrap gap-8 border-t border-white/[0.06] pt-10"
-          style={{ animationDelay: "0.4s" }}
-        >
-          {heroStats.map((item) => (
-            <div key={item.label} className="min-w-[8rem]">
-              <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-slate-500">
-                {item.label}
-              </p>
-              <p className="mt-1.5 font-mono text-sm text-cyan-100/90">{item.value}</p>
-            </div>
-          ))}
-        </div>
+        <aside className="hs-snapshot" aria-labelledby="hs-snapshot-title">
+          <div className="hs-snapshot-heading">
+            <p className="hs-eyebrow" id="hs-snapshot-title">Project snapshot</p>
+            <span className="hs-label">In development</span>
+          </div>
+          <h2>Work in the open.<br /><span>Progress you can inspect.</span></h2>
+          <p className="hs-snapshot-summary">{development.summary}</p>
+          <dl className="hs-snapshot-facts">
+            <div><dt>Project</dt><dd>Farcaster fork effort</dd></div>
+            <div><dt>Public access</dt><dd><a href="/network">Read endpoints <ArrowUpRight aria-hidden="true" /></a></dd></div>
+            <div><dt>Roadmap</dt><dd><a href="/updates">Merged work &amp; proposals <ArrowUpRight aria-hidden="true" /></a></dd></div>
+          </dl>
+          <div className="hs-snapshot-source">
+            <span>Reviewed <time dateTime={development.checkedAt}>{checkedDate}</time></span>
+            <a href={`https://github.com/farcasterorg/hypersnap/commit/${development.mainCommit}`} aria-label={`View Hypersnap source commit ${development.mainCommit.slice(0, 7)}`}>
+              <GitCommitHorizontal aria-hidden="true" /> {development.mainCommit.slice(0, 7)}
+            </a>
+          </div>
+        </aside>
       </div>
-
-      <div className="pointer-events-none absolute bottom-8 left-1/2 hidden -translate-x-1/2 lg:block">
-        <div className="scroll-bob flex flex-col items-center gap-2 text-slate-500">
-          <span className="text-[0.6rem] uppercase tracking-[0.2em]">Scroll</span>
-          <span className="h-8 w-px bg-gradient-to-b from-cyan-400/50 to-transparent" />
-        </div>
+      <div className="hs-container hs-hero-footnote">
+        <span>Open source. Source-linked. Still evolving.</span>
+        <a className="hs-text-link" href="#ecosystem">How the pieces fit together <ArrowRight aria-hidden="true" /></a>
       </div>
     </section>
   );

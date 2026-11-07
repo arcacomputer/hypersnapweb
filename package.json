@@ -8,6 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "lint": "eslint .",
+    "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "typecheck": "astro check && tsc --noEmit",
     "sync:sources": "node scripts/sync-sources.mjs",
     "cf:types": "wrangler types"

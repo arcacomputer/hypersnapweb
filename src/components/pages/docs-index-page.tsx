@@ -107,13 +107,14 @@ export function DocsIndexPage() {
         </Reveal>
       </div>
 
+      <aside className="dev-note mx-auto max-w-6xl"><strong>Documentation ≠ deployment.</strong> These pages mirror upstream interfaces. Confirm network identity, node version, authentication and index completeness before relying on a route. <a href="/updates">Read current development and proposal status →</a></aside>
       <Section eyebrow="Paths" title="Pick the path that fits.">
         <Stagger className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           <StaggerItem>
             <PathCard
               icon={Braces}
               title="Building an app"
-              body="The HTTP API is Farcaster v2-compatible — users, casts, feeds, channels, reactions, follows, search, batch reads, webhooks, and mini-app notifications."
+              body="Explore documented APIs for users, casts, feeds, reactions, search and integrations. Availability and completeness depend on the selected node, version and index readiness."
               ctaLabel="Open API reference"
               ctaHref={resolveSectionEntry(sections, ["Read API reference", "Webhooks"])}
             />

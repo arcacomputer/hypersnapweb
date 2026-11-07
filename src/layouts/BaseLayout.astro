@@ -14,6 +14,8 @@ import {
 } from "@/lib/seo";
 import { siteConfig } from "@/lib/site-config";
 import "@/styles/global.css";
+import "@/styles/refresh.css";
+import "@/styles/editorial.css";
 
 type Props = {
   title?: string;
@@ -30,7 +32,7 @@ const ogImage = new URL("/opengraph-image", Astro.site ?? "https://hypersnap.org
 const navItems = [
   { href: "/about", label: "About" },
   { href: "/network", label: "Network" },
-  { href: "/snap", label: "$SNAP" },
+  { href: "/updates", label: "Development" },
   { href: "/run-a-node", label: "Run a node" },
   { href: "/docs", label: "Docs" },
   { href: "/contribute", label: "Contribute" },
@@ -100,7 +102,7 @@ function isActive(href: string) {
             <span class="text-sm font-semibold tracking-tight text-white">hypersnap.org</span>
           </a>
 
-          <nav aria-label="Primary navigation" class="hidden items-center justify-end gap-0.5 md:flex">
+          <nav aria-label="Primary navigation" class="hidden items-center justify-end gap-0.5 xl:flex">
             {navItems.map((item) => (
               <a
                 class:list={[
@@ -108,6 +110,7 @@ function isActive(href: string) {
                   isActive(item.href) ? "text-white" : "text-slate-400 hover:text-white",
                 ]}
                 href={item.href}
+                aria-current={isActive(item.href) ? "page" : undefined}
               >
                 {isActive(item.href) ? (
                   <span
@@ -128,9 +131,10 @@ function isActive(href: string) {
               GitHub
             </a>
           </nav>
-          <MobileNav client:load items={navItems} organizationUrl={siteConfig.organizationUrl} />
+          <MobileNav client:load items={navItems} organizationUrl={siteConfig.organizationUrl} pathname={pathname} />
         </div>
       </ScrollHeader>
+      <noscript><nav aria-label="Navigation without JavaScript" class="flex flex-wrap gap-4 border-b border-white/10 px-6 py-4 text-sm xl:hidden">{navItems.map((item) => <a href={item.href}>{item.label}</a>)}</nav></noscript>
       <main id="main-content" tabindex="-1">
         <slot />
       </main>
@@ -139,8 +143,7 @@ function isActive(href: string) {
           <div>
             <p class="text-base font-semibold text-white">Hypersnap</p>
             <p class="mt-4 max-w-sm leading-7 text-slate-400">
-              A decentralized social network, built by a global community of contributors. No
-              company, no VC, no single owner.
+              Open-source infrastructure for independent Farcaster clients. Node software, portable social data and public protocol development.
             </p>
             <p class="mt-4 max-w-sm leading-7 text-slate-500">
               Hypersnap.org is built and maintained by{" "}
@@ -162,6 +165,10 @@ function isActive(href: string) {
                 <a class="rounded-sm hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-200" href="/about">About</a>
               </li>
               <li>
+                <a class="rounded-sm hover:text-white" href="/updates">Development</a>
+              </li><li>
+                <a class="rounded-sm hover:text-white" href="/snap">Economics research</a>
+              </li><li>
                 <a class="rounded-sm hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-200" href="/contribute">Contribute</a>
               </li>
               <li>
@@ -176,7 +183,7 @@ function isActive(href: string) {
                 <a class="rounded-sm hover:text-white" href="/docs">Docs hub</a>
               </li>
               <li>
-                <a class="rounded-sm hover:text-white" href="/network">Live network</a>
+                <a class="rounded-sm hover:text-white" href="/network">Public endpoints</a>
               </li>
               <li>
                 <a class="rounded-sm hover:text-white" href={`${siteConfig.publicNodeBaseUrl}/v1/info`}>

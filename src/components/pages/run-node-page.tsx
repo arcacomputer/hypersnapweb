@@ -61,23 +61,18 @@ const CONFIRM_COMMAND = `cd ~/hypersnap
 docker compose ps
 curl -s http://127.0.0.1:3381/v1/info | jq '{version, peer_id, shardInfos: [.shardInfos[] | {shardId, maxHeight, blockDelay}]}'`;
 
-const UPGRADE_COMMAND = `cd ~/hypersnap
+const UPGRADE_COMMAND = `# Only after reviewing the exact release and preserving a cold rollback.
+cd ~/hypersnap
 ./hypersnap.sh upgrade
 docker compose ps
 curl -s http://127.0.0.1:3381/v1/info | jq '.version'`;
 
-const SSH_HARDENING_COMMAND = `# 1. Generate a key locally if you don't have one (run on your laptop)
-ssh-keygen -t ed25519 -C "hypersnap-operator"
-
-# 2. Copy it to the server
-ssh-copy-id <user>@<server-ip>
-
-# 3. On the server, disable password + root SSH
-sudo sed -i \\
-  -e 's/^#\\?PasswordAuthentication.*/PasswordAuthentication no/' \\
-  -e 's/^#\\?PermitRootLogin.*/PermitRootLogin prohibit-password/' \\
-  /etc/ssh/sshd_config
-sudo systemctl reload ssh`;
+const SSH_HARDENING_COMMAND = `# Read-only inspection on the server; no configuration change or reload.
+sudo sshd -t
+sudo sshd -T | grep -E '^(passwordauthentication|permitrootlogin|pubkeyauthentication|authenticationmethods|allowusers|allowgroups) '
+# Match rules may change the effective policy for your user/address.
+# Keep this session open. Test a SECOND key-based sudo login and
+# a provider rescue/console path before planning any access changes.`;
 
 const AUTO_UPDATES_COMMAND = `sudo apt update
 sudo apt install -y unattended-upgrades
@@ -107,7 +102,7 @@ mkdir -p ~/hypersnap
 cd ~/hypersnap
 ${sources.node.bootstrapCommand}
 
-It will ask you to acknowledge there are no current token rewards. That prompt is expected.`;
+Read the script and pin a reviewed revision before running it. A bootstrap reward notice is not proof about token existence or eligibility. Running a node does not guarantee earnings.`;
 
 const FRIEND_DEBUG_MESSAGE = `Please run this and paste the full text output:
 
@@ -146,7 +141,8 @@ const TROUBLESHOOTING: Array<{ title: ReactNode; open?: boolean; body: ReactNode
     body: (
       <p>
         Often normal during snapshot bootstrap. Check the logs for snapshot chunk progress before
-        declaring the node dead. The endpoint usually wakes up within the first hour.
+        declaring the node dead. There is no fixed endpoint-start or full-readiness deadline;
+        inspect the current phase and resource usage.
       </p>
     ),
   },
@@ -180,7 +176,7 @@ const TROUBLESHOOTING: Array<{ title: ReactNode; open?: boolean; body: ReactNode
         </p>
         <ul className="mt-2 list-disc space-y-1 pl-5">
           <li>Is the node actually receiving peer traffic? <code>docker compose logs</code> should mention peers / gossip.</li>
-          <li>Are the firewall rules letting peers in on UDP 3382?</li>
+          <li>Do firewall rules match the P2P protocols/ports in the exact installed configuration (commonly UDP 3382)?</li>
           <li>Is the server&apos;s clock synced? Drift breaks block validation. <code>timedatectl</code> should report active NTP.</li>
           <li>Is disk full or near full? <code>df -h</code>.</li>
         </ul>
@@ -194,8 +190,9 @@ const TROUBLESHOOTING: Array<{ title: ReactNode; open?: boolean; body: ReactNode
         Read the logs from the latest exit:{" "}
         <code>docker compose logs --tail 200 hypersnap</code>. Look for the first error before the
         crash, not the last line. The most common causes are missing volumes, corrupted state from
-        a hard kill mid-write, or a release version mismatch after a partial upgrade — try{" "}
-        <code>./hypersnap.sh down &amp;&amp; ./hypersnap.sh upgrade</code>.
+        a hard kill mid-write, or a release version mismatch after a partial upgrade. Inspect the
+        image, configuration, mounts and release notes before changing anything; do not loop upgrades
+        or open a changed database with an older writer.
       </p>
     ),
   },
@@ -225,11 +222,11 @@ const GLOSSARY: Array<{ term: string; definition: ReactNode }> = [
   },
   {
     term: "Sync / catch-up",
-    definition: "The phase where the node imports the snapshot and then follows the latest peer activity until it's current. Usually a couple of hours on a fresh install.",
+    definition: "Snapshot import and live chain catch-up are only part of readiness. Archive replay, reconciliation, index reconstruction and native application checks may finish later; there is no universal full-node ETA.",
   },
   {
     term: "blockDelay",
-    definition: "How far behind the live tip the node is, in blocks. Closer to zero = closer to synced. Healthy steady-state is roughly under 20.",
+    definition: "A reported chain-lag field. Confirm its units and semantics in the installed version before choosing thresholds. Low lag does not prove archive, reconciliation, index or application readiness.",
   },
   {
     term: "Shard",
@@ -237,7 +234,7 @@ const GLOSSARY: Array<{ term: string; definition: ReactNode }> = [
   },
   {
     term: "Peer / gossip",
-    definition: "Other nodes your node talks to. They share new messages over a gossip protocol on UDP — that's why UDP 3382 needs to be open.",
+    definition: "Other nodes your node talks to. Verify gossip and synchronization protocols/ports in your installed configuration before opening only the required peer listeners.",
   },
   {
     term: "FID",
@@ -253,7 +250,7 @@ const GLOSSARY: Array<{ term: string; definition: ReactNode }> = [
   },
   {
     term: "Stable / nightly channel",
-    definition: "Stable is the released, tested build. Nightly is the latest commit on main. Run stable in production; use nightly only if you're testing.",
+    definition: "Image-channel labels, not provenance or test receipts. Resolve the exact image digest, source commit and release/qualification evidence. Neither stable nor nightly proves current main or suitability for your database.",
   },
 ];
 
@@ -393,10 +390,10 @@ export function RunNodePage() {
       <div className="mx-auto w-full max-w-6xl px-6 sm:px-8 lg:px-10">
         <WarningPanel>
           <p>
-            <span className="font-semibold text-amber-200">Reality check:</span> the install script asks operators
-            to acknowledge that the network has not released a token and running a node currently
-            doesn&apos;t earn tokens. Future incentive chatter is not a promise. Don&apos;t treat
-            this as guaranteed rewards.
+            <span className="font-semibold text-amber-200">Reality check:</span> running a node does not guarantee
+            earnings or reward eligibility. Public economics proposals and attributed Ethereum
+            distribution claims are not adopted protocol rewards. Read the{" "}
+            <a className="text-cyan-100 underline" href="/snap">economics evidence</a> before spending.
           </p>
         </WarningPanel>
       </div>
@@ -411,6 +408,12 @@ export function RunNodePage() {
               title="It's the most direct way to make the network real."
               description="A decentralized network is decentralized only if many independent people run a piece of it. Today, that piece is you."
             >
+              <p className="mb-6 text-sm leading-7 text-slate-300">
+                A read/API node is not automatically a validator. Validator membership and network
+                activation require separate coordination. At the November 7, 2026 source check,{" "}
+                <a className="text-cyan-100 underline" href="https://github.com/farcasterorg/hypersnap/pull/61">PR #61</a>{" "}
+                remained open/unmerged; its operator keys are not proof of active independent validators.
+              </p>
               <div className="grid gap-5 md:grid-cols-3">
                 <InfoPanel icon={Network} title="More nodes = more independence">
                   <p>
@@ -439,41 +442,42 @@ export function RunNodePage() {
             <GuideSection
               id="expect"
               eyebrow="What to expect"
-              title="Cost, time, and effort, in concrete numbers."
-              description="No magic, no hand-waving. Here's roughly what a beginner-grade node costs and how much attention it needs."
+              title="Budget for storage, transfer and operating time."
+              description="Use upstream requirements as a starting point, then check current provider pricing and the exact release's data/rebuild needs."
             >
               <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
                 <InfoPanel icon={Banknote} title="Monthly cost">
                   <p>
-                    A 4 vCPU / 16 GB VPS plus 1.5 TB block storage runs roughly{" "}
-                    <span className="font-semibold text-white">$80–$110/month</span> at common
-                    cloud providers. Spare home hardware can be free, with the trade-offs noted in
-                    Provision.
+                    Price compute, persistent storage, backup capacity and network transfer together.
+                    Provider rates and data growth vary. Home hardware still has electricity,
+                    storage and connectivity costs; no income is guaranteed for operating a node.
                   </p>
                 </InfoPanel>
                 <InfoPanel icon={Clock} title="Initial sync">
                   <p>
-                    Catch-up from snapshots usually takes a few hours over a healthy connection. The
-                    HTTP endpoint may refuse connections during the first stretch — that&apos;s
-                    normal.
+                    Timing depends on data size, hardware, bandwidth and release. Snapshot download,
+                    chain catch-up, archive replay, reconciliation and indexes are separate phases.
+                    An HTTP response is not a full-readiness signal.
                   </p>
                 </InfoPanel>
                 <InfoPanel icon={Wifi} title="Bandwidth">
                   <p>
-                    Plan for low-hundreds of GB transferred during initial sync, then steady ongoing
-                    peer traffic. A standard cloud monthly transfer allowance is fine.
+                    Confirm the current snapshot size and transfer allowance before downloading.
+                    Bootstrap, historical replay and ongoing peer traffic can have different
+                    resource needs; include retry and egress charges in the budget.
                   </p>
                 </InfoPanel>
                 <InfoPanel icon={CalendarClock} title="Ongoing effort">
                   <p>
-                    Once it&apos;s synced: glance at logs and disk a couple of times a week. Run an
-                    upgrade every few weeks when releases ship. Total: minutes, not hours.
+                    Monitor process health, every shard, storage growth and data-readiness gates.
+                    Schedule upgrades after reviewing release notes and preserving recovery options;
+                    repair or reconstruction may require more operator attention.
                   </p>
                 </InfoPanel>
               </div>
               <p className="mt-6 text-xs leading-5 text-slate-400">
-                Numbers are rough — your real cost depends on the provider and chain growth over
-                time. They&apos;re here so you can plan, not to lock you into anyone&apos;s pricing.
+                This is a planning checklist, not a current provider quote, sync benchmark or
+                reward forecast. Recheck capacity as the network and installed release change.
               </p>
             </GuideSection>
 
@@ -491,7 +495,7 @@ export function RunNodePage() {
                     <ChecklistItem>4 vCPU / 16 GB RAM minimum</ChecklistItem>
                     <ChecklistItem>1.5 TB block storage minimum (1.6 TB gives breathing room)</ChecklistItem>
                     <ChecklistItem>Public IPv4 address</ChecklistItem>
-                    <ChecklistItem>Cloud Firewall: SSH restricted, P2P / API ports open</ChecklistItem>
+                    <ChecklistItem>Firewall: restricted SSH, verified P2P listeners only; HTTP local/private by default</ChecklistItem>
                   </ul>
                   <p className="mt-4 text-xs leading-5 text-slate-400">
                     Shared CPU works if budget matters. Dedicated CPU is more reliable for
@@ -530,15 +534,16 @@ export function RunNodePage() {
                 </InfoPanel>
                 <InfoPanel icon={Network} title="Ports">
                   <ul className="space-y-2 text-sm leading-6">
-                    {sources.node.ports.map((port) => (
-                      <li key={port}>{port}</li>
-                    ))}
+                    <li>HTTP API: TCP 3381, local/private by default</li>
+                    <li>Typical gossip mapping: UDP 3382; gRPC TCP 3383 stays private/authenticated</li>
+                    <li>Confirm exact protocols, binds and published ports in your installed Compose/config</li>
                   </ul>
                 </InfoPanel>
                 <InfoPanel icon={Gauge} title="Catch-up">
                   <p className="text-sm leading-6">
-                    A new node downloads historical snapshots, then syncs until max heights rise and
-                    block delay approaches zero.
+                    Compare every shard&apos;s height and lag over time against a trusted reference
+                    for the same network. Then independently qualify archive, reconciliation,
+                    index and native application readiness below.
                   </p>
                 </InfoPanel>
               </div>
@@ -568,8 +573,9 @@ export function RunNodePage() {
                   <div className="mt-3 flex flex-wrap items-start gap-2 rounded-md border border-white/10 bg-white/[0.04] p-3 text-xs leading-5 text-slate-400">
                     <AlertTriangle aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-amber-200" />
                     <span>
-                      You&apos;ll be asked to acknowledge there are no current token rewards.
-                      That prompt is expected. {sources.node.noRewardsNotice}
+                      Inspect the bootstrap script and its fetched assets before execution. The
+                      command follows mutable main; use a reviewed commit for a reproducible install.
+                      Installer notices do not establish token provenance or reward eligibility.
                     </span>
                   </div>
                 </StepCard>
@@ -588,11 +594,24 @@ export function RunNodePage() {
               id="confirm"
               eyebrow="Confirm it's working"
               title="A short post-install checklist."
-              description="Bootstrap finishes long before catch-up does. Use this checklist a few hours after starting to confirm the node is genuinely healthy and not just running."
+              description="Start with process and chain checks, then verify each data and application phase separately. No fixed number of hours establishes full readiness."
             >
+              <div id="verify" className="scroll-mt-28 mb-6">
+                <WarningPanel>
+                  <p className="font-semibold text-white">Verification is a set of gates, not one green light.</p>
+                  <ul className="mt-3 list-disc space-y-2 pl-5">
+                    <li><strong>Chain:</strong> every configured shard advances on the intended network; compare height and lag with a same-network reference.</li>
+                    <li><strong>Archive:</strong> required historical blocks/messages are present and replay is complete on every shard, not just at the live tip.</li>
+                    <li><strong>Reconciliation:</strong> examine missing/rejected events, signer/registry continuity and repair state; scanned blocks alone do not prove successful merges.</li>
+                    <li><strong>Indexes:</strong> check search, graph, metrics and any replacement generation separately. A serving index may coexist with an unfinished rebuild.</li>
+                    <li><strong>Native application:</strong> verify known profiles, history, feeds and counts using the native API, without a fallback masking missing data. Signed actions require separate deliberate acceptance.</li>
+                  </ul>
+                  <p className="mt-3">Record version, image digest, network, observation time and evidence per gate. Unknown stays unknown; do not derive a whole-node percentage or completion ETA from one scan.</p>
+                </WarningPanel>
+              </div>
               <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
                 <div className="glass-panel rounded-2xl p-5">
-                  <h3 className="text-base font-semibold text-white">Three things to check</h3>
+                  <h3 className="text-base font-semibold text-white">Three preliminary checks</h3>
                   <ul className="mt-4 space-y-3">
                     <ChecklistItem>
                       <span>
@@ -613,16 +632,16 @@ export function RunNodePage() {
                     </ChecklistItem>
                     <ChecklistItem>
                       <span>
-                        <span className="font-medium text-white">blockDelay is decreasing:</span>{" "}
-                        check it twice, fifteen minutes apart. The number should go down. If
-                        it&apos;s flat, something is blocking peer traffic.
+                        <span className="font-medium text-white">Every shard advances:</span>{" "}
+                        sample twice, compare heights and lag with the same network, and inspect
+                        peers/resources if progress stops. Flat lag alone does not diagnose a firewall.
                       </span>
                     </ChecklistItem>
                   </ul>
                   <p className="mt-4 text-xs leading-5 text-slate-400">
-                    Healthy steady-state is roughly blockDelay under 20. Anything between 20 and a
-                    few thousand means catching up; bigger numbers mean either a fresh install or
-                    something blocking the catch-up.
+                    Confirm the installed version&apos;s lag units and expected thresholds. A running
+                    container, reachable info endpoint and low chain lag do not pass the remaining
+                    archive, reconciliation, index or application gates.
                   </p>
                 </div>
                 <div>
@@ -646,26 +665,28 @@ export function RunNodePage() {
                 <InfoPanel icon={Lock} title="Cloud firewall (recommended)">
                   <ul className="space-y-2 text-sm leading-6">
                     <li>TCP 22 from your IP or Tailscale only</li>
-                    <li>TCP 3381–3383 from all IPv4/IPv6 (if running a public node)</li>
-                    <li>UDP 3381–3383 from all IPv4/IPv6 (if running a public node)</li>
-                    <li>Outbound: allow all</li>
+                    <li>Allow only the P2P port/protocol pairs verified in your installed configuration</li>
+                    <li>Keep HTTP TCP 3381 and gRPC TCP 3383 bound to localhost or a restricted private interface</li>
+                    <li>Public HTTP requires a deliberate authenticated, rate-limited gateway and endpoint policy</li>
+                    <li>Review IPv4, IPv6, cloud rules and Docker mappings together; Docker publication may bypass UFW expectations</li>
                   </ul>
                 </InfoPanel>
-                <InfoPanel icon={Server} title="What Compose actually publishes">
+                <InfoPanel icon={Server} title="Typical mappings — verify before exposure">
                   <ul className="space-y-2 text-sm leading-6">
                     <li>
-                      <code className="font-mono text-cyan-100">3381:3381/tcp</code>
+                      <code className="font-mono text-cyan-100">127.0.0.1:3381:3381/tcp</code> for local HTTP
                     </li>
                     <li>
                       <code className="font-mono text-cyan-100">3382:3382/udp</code>
                     </li>
                     <li>
-                      <code className="font-mono text-cyan-100">3383:3383/tcp</code>
+                      <code className="font-mono text-cyan-100">127.0.0.1:3383:3383/tcp</code> for local gRPC
                     </li>
                   </ul>
                   <p className="mt-3 text-xs leading-5 text-slate-400">
-                    The README says ports 3381–3383 on TCP and UDP. The wider firewall rule is safer
-                    while upstream packaging is still moving.
+                    These are examples, not an assertion about your running Compose file. Inspect
+                    rendered mappings and actual listeners. Opening a broad TCP/UDP range increases
+                    exposure; it is not a safer substitute for verifying required protocols.
                   </p>
                 </InfoPanel>
               </div>
@@ -691,28 +712,29 @@ export function RunNodePage() {
               id="upgrades"
               eyebrow="Upgrades"
               title="Stay on a recent build, without surprises."
-              description="The protocol moves; nodes need to follow. The bundled script keeps upgrades simple."
+              description="Review release compatibility, image provenance and database changes before any restart. Keep a recoverable cold rollback before letting a new writer touch state."
             >
               <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                <InfoPanel icon={RefreshCw} title="Use the stable channel">
+                <InfoPanel icon={RefreshCw} title="Verify the exact artifact">
                   <p>
-                    Stable is what most operators should run. It&apos;s released, versioned, and
-                    won&apos;t pull untested code. Nightly tracks the latest commit and is for
-                    contributors testing changes — not for a production node.
+                    A stable tag does not prove current main, passing tests or deployment suitability.
+                    Record the image digest, source commit and qualification evidence. Main-source
+                    fixes and open PRs are not evidence that an image contains them.
                   </p>
                 </InfoPanel>
                 <InfoPanel icon={Settings} title="One-command upgrade">
                   <p>
                     The bundled script pulls the new image, restarts the container, and keeps the
-                    same volumes (so your synced state survives the upgrade).
+                    same volumes. That is a state-changing operation: a new writer may migrate or
+                    reconstruct data. Preserve identity/config and a consistent cold database backup
+                    with the old image before running it; test the recovery path.
                   </p>
                 </InfoPanel>
                 <InfoPanel icon={CircleCheck} title="Verify after">
                   <p>
-                    Confirm the new version landed and the node still answers{" "}
-                    <code className="font-mono text-cyan-100">/v1/info</code>. If it doesn&apos;t,
-                    check logs immediately — don&apos;t leave a partially-upgraded node running
-                    overnight.
+                    Confirm the intended digest/version, configuration and mounted database, then
+                    repeat the separate chain, archive, reconciliation, index and native application
+                    gates. An info response alone does not qualify an upgrade.
                   </p>
                 </InfoPanel>
               </div>
@@ -720,8 +742,11 @@ export function RunNodePage() {
                 <CodeBlock label="Upgrade and verify" command={UPGRADE_COMMAND} />
               </div>
               <p className="mt-4 text-xs leading-5 text-slate-400">
-                If an upgrade introduces a hard schema change, the node may need to re-sync from a
-                fresh snapshot. Watch the release notes when bumping a major version.
+                Cold rollback means the preserved old writer uses only its own unchanged, consistent
+                database copy. Never open a changed database with an old writer. Do not share mutable
+                database files or inherited SST inodes between old and new writers. Retain the known-good
+                fallback until the successor passes acceptance; a major-version label is not the only
+                signal of migration or rebuild work.
               </p>
             </GuideSection>
 
@@ -730,15 +755,17 @@ export function RunNodePage() {
               id="hardening"
               eyebrow="Hardening"
               title="Lock down the server itself."
-              description="The node is one process on a Linux server, and the server is the bigger attack surface. These are the defaults you'd want anywhere — they take ten minutes."
+              description="Inspect access policy first. Access changes need a tested second login, a working rescue path and a deliberate maintenance plan."
             >
               <div className="grid gap-5 md:grid-cols-2">
-                <InfoPanel icon={KeyRound} title="SSH: keys only, no root">
+                <InfoPanel icon={KeyRound} title="SSH: inspect before hardening">
                   <p className="mb-4">
-                    Disable password login. Disable direct root SSH. Use a key-only login for a
-                    sudo-capable user.
+                    Prefer a key-based, sudo-capable non-root account. Keep the current session open
+                    and test a second login plus provider console/rescue access before changing root
+                    or password policy. Review included files and Match rules; do not blindly edit
+                    sshd_config or reload SSH from a generic script.
                   </p>
-                  <CodeBlock label="SSH hardening" command={SSH_HARDENING_COMMAND} />
+                  <CodeBlock label="Read-only SSH policy inspection" command={SSH_HARDENING_COMMAND} />
                 </InfoPanel>
                 <InfoPanel icon={ShieldCheck} title="Automatic security updates">
                   <p className="mb-4">
@@ -893,21 +920,21 @@ export function RunNodePage() {
             >
               <div className="grid gap-3 sm:grid-cols-2">
                 <SourceLink
-                  href="https://github.com/farcasterorg/hypersnap"
+                  href="https://github.com/farcasterorg/hypersnap/tree/c0ce1755d9b7058f79b41c1f236a2b9a7041d348"
                   label="farcasterorg/hypersnap"
-                  sub="Protocol implementation and bootstrap script source"
+                  sub="Main source checked November 7, 2026; not a release or runtime audit"
                   icon={ScrollText}
                 />
                 <SourceLink
-                  href="https://raw.githubusercontent.com/farcasterorg/hypersnap/refs/heads/main/scripts/hypersnap-bootstrap.sh"
+                  href="https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/scripts/hypersnap-bootstrap.sh"
                   label="hypersnap-bootstrap.sh"
-                  sub="The exact script the install command runs"
+                  sub="Pinned bootstrap reference; the example install command follows mutable main"
                   icon={Cpu}
                 />
                 <SourceLink
-                  href="https://raw.githubusercontent.com/farcasterorg/hypersnap/refs/heads/main/docker-compose.mainnet.yml"
+                  href="https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/docker-compose.mainnet.yml"
                   label="docker-compose.mainnet.yml"
-                  sub="Current mainnet Compose file"
+                  sub="Pinned Compose reference; inspect your actual installed mappings and image"
                   icon={ShieldCheck}
                 />
                 <SourceLink
@@ -944,8 +971,8 @@ export function RunNodePage() {
                 </p>
                 <p className="mt-3 text-xs leading-5 text-slate-400">
                   This page wraps upstream — it doesn&apos;t replace it. Upstream docs are still
-                  moving fast and mix Snapchain / Hypersnap language. When in doubt, run the linked
-                  source.
+                  moving fast and mix Snapchain / Hypersnap language. Review a pinned revision and
+                  its compatibility before executing anything; this page does not certify a deployment.
                 </p>
               </div>
             </GuideSection>

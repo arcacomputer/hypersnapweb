@@ -12,13 +12,13 @@ export function ContributePage() {
       <PageHeader
         eyebrow="Contribute"
         title="Anyone can help build it."
-        description="Hypersnap is built by a global community of contributors — no company, no VC, no single owner. Code matters, and so do docs, design, ideas, and running a node. Here's where the work happens and how to plug in."
+        description="Help make social infrastructure more independent. Contribute node code, documentation, design, application integration or carefully scoped operator feedback."
       />
 
       <Section
         eyebrow="Where the work lives"
         title="The public repositories."
-        description={`Everything is on GitHub at github.com/farcasterorg. Every change is a PR. The snapshot below was last refreshed on ${formatDate(sources.sourceUpdatedAt)}.`}
+        description={`Public work is distributed across the farcasterorg repositories and discussions. This repository/docs metadata snapshot was refreshed on ${formatDate(sources.sourceUpdatedAt)}.`}
       >
         <Stagger className="grid gap-6 lg:grid-cols-2">
           {repos.map((repo) => (
@@ -89,7 +89,7 @@ export function ContributePage() {
       <Section
         eyebrow="Automation"
         title="How the site stays honest."
-        description="A scheduled GitHub Action runs the same sync command maintainers can run locally, validates the site, and opens a reviewable PR whenever the source data changes."
+        description="A scheduled GitHub Action refreshes repository/docs metadata and opens a reviewable PR. The dated development notes are curated separately: metadata synchronization never certifies deployment or advances the editorial review date."
       >
         <Reveal>
           <div className="grid gap-5 md:grid-cols-2">

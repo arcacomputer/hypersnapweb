@@ -1,4 +1,6 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile, readFile, rename, unlink } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
+import { pathToFileURL } from "node:url";
 import path from "node:path";
 import process from "node:process";
 import { unified } from "unified";
@@ -18,53 +20,99 @@ import { visit } from "unist-util-visit";
 const ORG = "farcasterorg";
 const API_BASE = "https://api.github.com";
 const OUT_FILE = path.join(process.cwd(), "src/data/farcasterorg-sources.json");
-const SOURCE_REPO_ORDER = ["hypersnap", "hypersnap-docs-web", "snap", "protocol"];
+const SOURCE_REPO_ORDER = ["hypersnap", "hypersnap-docs-web", "snap", "protocol", "client-snapshot", "miniapps"];
 
 const DOCS_LINK_LIMIT = 80;
 const README_HEADING_LIMIT = 10;
 
-const githubToken = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
-
-async function fetchGithubJson(url, { optional = false } = {}) {
-  const response = await fetch(url, {
-    headers: {
-      Accept: "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28",
-      ...(githubToken ? { Authorization: `Bearer ${githubToken}` } : {}),
-    },
-  });
-
-  if ((response.status === 404 || response.status === 409) && optional) {
-    return null;
+// Fail closed: a partial refresh never replaces the accepted snapshot.
+export function createGithubClient({ token = "", fetchImpl = (...args) => fetch(...args), requestTimeoutMs = 15_000, budgetMs = 180_000, maxRequests = 300, maxResponseBytes = 8 * 1024 * 1024, maxTotalBytes = 32 * 1024 * 1024 } = {}) {
+  const deadline = Date.now() + budgetMs;
+  let requests = 0;
+  let totalBytes = 0;
+  async function request(url, { optional = false, emptyRepo = false, text = false } = {}) {
+    const parsed = new URL(url);
+    if (parsed.origin !== API_BASE || parsed.username || parsed.password) throw new Error("Unexpected GitHub request origin");
+    if (++requests > maxRequests || Date.now() >= deadline) throw new Error("Source collection budget exceeded");
+    const response = await fetchImpl(url, {
+      redirect: "error",
+      signal: AbortSignal.timeout(Math.min(requestTimeoutMs, deadline - Date.now())),
+      headers: {
+        Accept: text ? "application/vnd.github.raw" : "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+    if ((response.status === 404 && optional) || (response.status === 409 && emptyRepo)) {
+      await response.body?.cancel();
+      return text ? "" : null;
+    }
+    if (!response.ok) {
+      await response.body?.cancel();
+      throw new Error(`GitHub request failed: HTTP ${response.status} ${parsed.pathname}`);
+    }
+    const byteLimit = text ? Math.min(maxResponseBytes, 2 * 1024 * 1024) : maxResponseBytes;
+    if (Number(response.headers.get("content-length")) > byteLimit) {
+      await response.body?.cancel();
+      throw new Error("GitHub response exceeds byte budget");
+    }
+    const reader = response.body.getReader();
+    const chunks = [];
+    let size = 0;
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        size += value.byteLength;
+        totalBytes += value.byteLength;
+        if (size > byteLimit || totalBytes > maxTotalBytes || Date.now() >= deadline) throw new Error("GitHub response exceeds collection budget");
+        chunks.push(value);
+      }
+    } catch (error) {
+      await reader.cancel();
+      throw error;
+    } finally {
+      reader.releaseLock();
+    }
+    const body = Buffer.concat(chunks).toString("utf8");
+    return text ? body : JSON.parse(body);
   }
-
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`GitHub request failed: ${response.status} ${url}\n${body}`);
-  }
-
-  return response.json();
+  return {
+    json: (url, options) => request(url, options),
+    text: (url, options) => request(url, { ...options, text: true }),
+    get requests() { return requests; },
+    get bytes() { return totalBytes; },
+  };
 }
 
-async function fetchGithubText(url, { optional = false } = {}) {
-  const response = await fetch(url, {
-    headers: {
-      Accept: "application/vnd.github.raw",
-      "X-GitHub-Api-Version": "2022-11-28",
-      ...(githubToken ? { Authorization: `Bearer ${githubToken}` } : {}),
-    },
-  });
-
-  if ((response.status === 404 || response.status === 409) && optional) {
-    return "";
+export async function listPublicRepos(client, expectedCount) {
+  const repos = [];
+  const seen = new Set();
+  for (let page = 1; page <= 10; page++) {
+    const batch = await client.json(`${API_BASE}/orgs/${ORG}/repos?type=public&per_page=100&page=${page}`);
+    if (!Array.isArray(batch)) throw new Error("Invalid repository listing");
+    for (const repo of batch) {
+      if (!repo.name || repo.private || seen.has(repo.name)) throw new Error("Invalid or duplicate public repository");
+      seen.add(repo.name);
+      repos.push(repo);
+    }
+    if (batch.length < 100) {
+      if (repos.length !== expectedCount) throw new Error(`Public repository count changed or incomplete: ${repos.length}/${expectedCount}`);
+      return repos;
+    }
   }
+  throw new Error("Repository pagination budget exceeded");
+}
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`GitHub text request failed: ${response.status} ${url}\n${body}`);
+export async function atomicWriteSnapshot(file, snapshot) {
+  await mkdir(path.dirname(file), { recursive: true });
+  const temporary = `${file}.${process.pid}.${crypto.randomUUID()}.tmp`;
+  try {
+    await writeFile(temporary, `${JSON.stringify(snapshot, null, 2)}\n`, { flag: "wx" });
+    await rename(temporary, file);
+  } finally {
+    await unlink(temporary).catch((error) => { if (error.code !== "ENOENT") throw error; });
   }
-
-  return response.text();
 }
 
 function sortRepos(repos) {
@@ -119,14 +167,15 @@ function extractRequirementBullets(readme) {
       "4 CPU cores or vCPUs",
       "1.5 TB free storage",
       "Public IP address",
-      "Ports 3381-3383 exposed on TCP and UDP",
+      "Allow peer gossip on 3382/udp; keep HTTP 3381/tcp and gRPC 3383/tcp private or authenticated",
     ];
   }
 
   return match[0]
     .split("\n")
     .map((line) => line.match(/^\s*-\s+(.+)$/)?.[1]?.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .map((line) => /ports?.*338[123]/i.test(line) ? "Allow peer gossip on 3382/udp; keep HTTP 3381/tcp and gRPC 3383/tcp private or authenticated" : line);
 }
 
 function extractHyperGoals(hyperDoc) {
@@ -247,30 +296,18 @@ async function renderMarkdownToHtml(markdown, currentDir) {
   return { html: String(file), toc };
 }
 
-async function enrichDocsLinks(docsLinks, repoName, branch) {
+async function enrichDocsLinks(docsLinks, repoName, branch, client) {
   const enriched = [];
   for (const link of docsLinks) {
     const slug = computeDocSlug(link.sourcePath);
     const dir = computeDocDir(link.sourcePath);
-    const markdown = await fetchGithubText(
+    const markdown = await client.text(
       `${API_BASE}/repos/${ORG}/${repoName}/contents/${link.sourcePath}?ref=${encodeURIComponent(branch)}`,
-      { optional: true },
     );
 
-    if (!markdown) {
-      enriched.push({ ...link, slug, contentHtml: "", contentMarkdown: "", toc: [] });
-      continue;
-    }
+    if (!markdown.trim()) throw new Error(`Empty documentation: ${link.sourcePath}`);
 
-    let contentHtml = "";
-    let toc = [];
-    try {
-      const result = await renderMarkdownToHtml(markdown, dir);
-      contentHtml = result.html;
-      toc = result.toc;
-    } catch (error) {
-      console.error(`Failed to render ${link.sourcePath}:`, error.message);
-    }
+    const { html: contentHtml, toc } = await renderMarkdownToHtml(markdown, dir);
 
     enriched.push({
       ...link,
@@ -313,7 +350,8 @@ function extractDocsLinksFromSummary(summary, repoName, branch) {
     });
   }
 
-  return links.slice(0, DOCS_LINK_LIMIT);
+  if (links.length > DOCS_LINK_LIMIT) throw new Error("Documentation index exceeds collection budget");
+  return links;
 }
 
 function docsLinksFromTree(tree, repoName, branch) {
@@ -340,21 +378,20 @@ function docsLinksFromTree(tree, repoName, branch) {
     }));
 }
 
-async function getRepoTree(repoName, branch) {
+export async function getRepoTree(repoName, branch, client) {
   if (!branch) {
     return [];
   }
 
-  const tree = await fetchGithubJson(
+  const tree = await client.json(
     `${API_BASE}/repos/${ORG}/${repoName}/git/trees/${encodeURIComponent(branch)}?recursive=1`,
-    { optional: true },
   );
-
-  return tree?.tree ?? [];
+  if (tree.truncated || !Array.isArray(tree.tree)) throw new Error(`Incomplete source tree: ${repoName}`);
+  return tree.tree;
 }
 
-async function getLatestRelease(repoName) {
-  const release = await fetchGithubJson(`${API_BASE}/repos/${ORG}/${repoName}/releases/latest`, {
+async function getLatestRelease(repoName, client) {
+  const release = await client.json(`${API_BASE}/repos/${ORG}/${repoName}/releases/latest`, {
     optional: true,
   });
 
@@ -370,43 +407,43 @@ async function getLatestRelease(repoName) {
   };
 }
 
-async function buildRepoSnapshot(repo) {
+export async function buildRepoSnapshot(repo, client) {
   const defaultBranch = repo.default_branch || "";
-  const readme = defaultBranch
-    ? await fetchGithubText(`${API_BASE}/repos/${ORG}/${repo.name}/readme`, { optional: true })
+  const commit = defaultBranch ? await client.json(`${API_BASE}/repos/${ORG}/${repo.name}/commits/${encodeURIComponent(defaultBranch)}`, { emptyRepo: true }) : null;
+  const sourceCommit = commit?.sha;
+  if (commit && !/^[a-f0-9]{40}$/.test(sourceCommit)) throw new Error(`Invalid source commit: ${repo.name}`);
+  const readme = sourceCommit
+    ? await client.text(`${API_BASE}/repos/${ORG}/${repo.name}/readme?ref=${sourceCommit}`, { optional: true })
     : "";
-  const tree = await getRepoTree(repo.name, defaultBranch);
-  const latestRelease = await getLatestRelease(repo.name);
+  const tree = await getRepoTree(repo.name, sourceCommit, client);
+  const latestRelease = await getLatestRelease(repo.name, client);
 
-  let docsLinks = docsLinksFromTree(tree, repo.name, defaultBranch);
+  let docsLinks = docsLinksFromTree(tree, repo.name, sourceCommit);
   let publicNodeReferences = [];
   let architectureNotes = [];
   let nodeRequirements = [];
 
   if (repo.name === "hypersnap") {
-    const hyperDoc = await fetchGithubText(
-      `${API_BASE}/repos/${ORG}/${repo.name}/contents/docs/hyper.md?ref=${encodeURIComponent(defaultBranch)}`,
-      { optional: true },
-    );
+    const hyperDoc = tree.some((item) => item.path === "docs/hyper.md") ? await client.text(
+      `${API_BASE}/repos/${ORG}/${repo.name}/contents/docs/hyper.md?ref=${sourceCommit}`,
+    ) : "";
     architectureNotes = extractHyperGoals(hyperDoc);
     nodeRequirements = extractRequirementBullets(readme);
   }
 
   if (repo.name === "hypersnap-docs-web") {
-    const summary = await fetchGithubText(
-      `${API_BASE}/repos/${ORG}/${repo.name}/contents/src/SUMMARY.md?ref=${encodeURIComponent(defaultBranch)}`,
-      { optional: true },
+    const summary = await client.text(
+      `${API_BASE}/repos/${ORG}/${repo.name}/contents/src/SUMMARY.md?ref=${sourceCommit}`,
     );
-    const intro = await fetchGithubText(
-      `${API_BASE}/repos/${ORG}/${repo.name}/contents/src/introduction.md?ref=${encodeURIComponent(defaultBranch)}`,
-      { optional: true },
+    const intro = await client.text(
+      `${API_BASE}/repos/${ORG}/${repo.name}/contents/src/introduction.md?ref=${sourceCommit}`,
     );
-    const gettingStarted = await fetchGithubText(
-      `${API_BASE}/repos/${ORG}/${repo.name}/contents/src/getting-started.md?ref=${encodeURIComponent(defaultBranch)}`,
-      { optional: true },
+    const gettingStarted = await client.text(
+      `${API_BASE}/repos/${ORG}/${repo.name}/contents/src/getting-started.md?ref=${sourceCommit}`,
     );
-    docsLinks = extractDocsLinksFromSummary(summary, repo.name, defaultBranch);
-    docsLinks = await enrichDocsLinks(docsLinks, repo.name, defaultBranch);
+    docsLinks = extractDocsLinksFromSummary(summary, repo.name, sourceCommit);
+    if (!docsLinks.length) throw new Error("Empty documentation index");
+    docsLinks = await enrichDocsLinks(docsLinks, repo.name, sourceCommit, client);
     publicNodeReferences = [extractPublicNode([readme, intro, gettingStarted])];
   } else {
     docsLinks = docsLinks.map((link) => ({
@@ -420,7 +457,8 @@ async function buildRepoSnapshot(repo) {
     description: repo.description || "",
     url: repo.html_url,
     defaultBranch,
-    isEmpty: !defaultBranch || (tree.length === 0 && !readme),
+    ...(sourceCommit ? { sourceCommit } : {}),
+    isEmpty: !sourceCommit,
     primaryLanguage: repo.language || null,
     license: repo.license?.spdx_id || null,
     stars: repo.stargazers_count,
@@ -440,14 +478,44 @@ async function buildRepoSnapshot(repo) {
   };
 }
 
+export function validateSnapshot(snapshot, previous) {
+  if (!snapshot.repos.length || snapshot.repos.length !== snapshot.organization.publicRepoCount) throw new Error("Incomplete public repository snapshot");
+  const currentDocs = snapshot.repos.find((repo) => repo.name === "hypersnap-docs-web")?.docsLinks ?? [];
+  const slugs = new Set();
+  for (const doc of currentDocs) {
+    if (!doc.slug || slugs.has(doc.slug) || !doc.contentHtml?.trim() || !doc.contentMarkdown?.trim()) throw new Error("Missing or duplicate rendered documentation");
+    slugs.add(doc.slug);
+  }
+  for (const doc of previous?.repos?.find((repo) => repo.name === "hypersnap-docs-web")?.docsLinks ?? []) {
+    if (doc.contentHtml && !slugs.has(doc.slug)) throw new Error(`Previously rendered doc missing: ${doc.slug}; review removal before accepting`);
+  }
+}
+
+export function resolveGithubToken({ environment = process.env, execute = execFileSync } = {}) {
+  // CI supplies a repository-scoped token; no stored gh account exists there.
+  const supplied = environment.GH_TOKEN?.trim() || environment.GITHUB_TOKEN?.trim();
+  if (supplied) return supplied;
+  if (environment.CI) throw new Error("Source sync requires GH_TOKEN or GITHUB_TOKEN in CI");
+  // Local fallback selects the approved account without switching shared auth.
+  try {
+    const token = execute("gh", ["auth", "token", "--user", "arcabotai"], { encoding: "utf8", timeout: 10_000, stdio: ["ignore", "pipe", "pipe"] }).trim();
+    if (token) return token;
+  } catch { /* Never include credential command output in an error. */ }
+  throw new Error("The local arcabotai GitHub credential is unavailable");
+}
+
 async function main() {
-  const org = await fetchGithubJson(`${API_BASE}/orgs/${ORG}`);
-  const repos = await fetchGithubJson(`${API_BASE}/orgs/${ORG}/repos?type=public&per_page=100`);
-  const sortedRepos = sortRepos(repos.filter((repo) => !repo.archived));
+  const startedAt = Date.now();
+  const token = resolveGithubToken();
+  const client = createGithubClient({ token });
+  const previous = JSON.parse(await readFile(OUT_FILE, "utf8"));
+  const org = await client.json(`${API_BASE}/orgs/${ORG}`);
+  const repos = await listPublicRepos(client, org.public_repos);
+  const sortedRepos = sortRepos(repos);
   const repoSnapshots = [];
 
   for (const repo of sortedRepos) {
-    repoSnapshots.push(await buildRepoSnapshot(repo));
+    repoSnapshots.push(await buildRepoSnapshot(repo, client));
   }
 
   const sourceUpdatedAt = repoSnapshots
@@ -470,6 +538,7 @@ async function main() {
       createdAt: org.created_at,
     },
     sourceUpdatedAt,
+    collectedAt: new Date().toISOString(),
     publicNode: {
       baseUrl: docsRepo?.sourceFacts.publicNodeReferences[0] || "https://haatz.quilibrium.com",
       infoEndpoint: "/v1/info",
@@ -490,18 +559,23 @@ async function main() {
         hypersnapRepo?.sourceFacts.nodeRequirements?.length
           ? hypersnapRepo.sourceFacts.nodeRequirements
           : extractRequirementBullets(""),
-      ports: ["3381/tcp HTTP", "3382/udp gossip", "3383/tcp gRPC"],
+      ports: ["3381/tcp HTTP — private or authenticated", "3382/udp peer gossip", "3383/tcp gRPC — private or authenticated"],
       noRewardsNotice:
-        "The network has not yet released a token. Running a node at this time will not earn tokens.",
+        "Running a node does not automatically guarantee rewards. Consult current official eligibility and participation guidance; proposals are not a promise of payment.",
     },
     repos: repoSnapshots,
   };
 
-  await mkdir(path.dirname(OUT_FILE), { recursive: true });
-  await writeFile(OUT_FILE, `${JSON.stringify(snapshot, null, 2)}\n`);
+  validateSnapshot(snapshot, previous);
+  if (Date.now() - startedAt > 180_000) throw new Error("Source collection runtime budget exceeded");
+  await atomicWriteSnapshot(OUT_FILE, snapshot);
+  console.log(JSON.stringify({ repos: repoSnapshots.map((repo) => ({ name: repo.name, sourceCommit: repo.sourceCommit ?? null, isEmpty: repo.isEmpty, docs: repo.docsLinks.length })), collectedAt: snapshot.collectedAt, sourceUpdatedAt, requests: client.requests, bytes: client.bytes }));
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  main().catch((error) => {
+    // Never print execFile errors with captured credential output or upstream bodies.
+    console.error(`Source sync failed: ${error.message.split("\n")[0]}`);
+    process.exitCode = 1;
+  });
+}
