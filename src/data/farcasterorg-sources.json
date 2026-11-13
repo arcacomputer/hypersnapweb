@@ -8,8 +8,8 @@
     "publicRepoCount": 6,
     "createdAt": "2026-02-15T23:02:53Z"
   },
-  "sourceUpdatedAt": "2026-11-06T14:33:16Z",
-  "collectedAt": "2026-11-07T07:59:39.328Z",
+  "sourceUpdatedAt": "2026-11-13T08:36:03Z",
+  "collectedAt": "2026-11-13T17:15:09.716Z",
   "publicNode": {
     "baseUrl": "https://haatz.quilibrium.com",
     "infoEndpoint": "/v1/info",
@@ -56,15 +56,15 @@
       "description": "Snapchain, made hyperdimensional",
       "url": "https://github.com/farcasterorg/hypersnap",
       "defaultBranch": "main",
-      "sourceCommit": "c0ce1755d9b7058f79b41c1f236a2b9a7041d348",
+      "sourceCommit": "a85fd221bb311fc2b25670a8215e6ce41e231e8a",
       "isEmpty": false,
       "primaryLanguage": "Rust",
       "license": "GPL-3.0",
-      "stars": 71,
+      "stars": 74,
       "forks": 26,
-      "openIssues": 21,
-      "pushedAt": "2026-11-06T14:33:16Z",
-      "updatedAt": "2026-11-07T06:42:11Z",
+      "openIssues": 19,
+      "pushedAt": "2026-11-13T08:36:03Z",
+      "updatedAt": "2026-11-12T09:29:21Z",
       "latestRelease": {
         "tagName": "v0.11.8",
         "name": "v0.11.8",
@@ -82,287 +82,308 @@
         "Social graph rebuilds",
         "Engagement metrics replacement",
         "Live daily stats",
-        "Contributing"
+        "Native account registration"
       ],
       "docsLinks": [
         {
           "title": "Hyper",
           "section": "Architecture",
           "sourcePath": "docs/hyper.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/docs/hyper.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/docs/hyper.md",
           "slug": "hyper"
+        },
+        {
+          "title": "Native Registration",
+          "section": "Architecture",
+          "sourcePath": "docs/native-registration.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/docs/native-registration.md",
+          "slug": "native-registration"
+        },
+        {
+          "title": "Peer Discovery",
+          "section": "Architecture",
+          "sourcePath": "docs/peer-discovery.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/docs/peer-discovery.md",
+          "slug": "peer-discovery"
+        },
+        {
+          "title": "Shuttle",
+          "section": "Architecture",
+          "sourcePath": "docs/shuttle.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/docs/shuttle.md",
+          "slug": "shuttle"
         },
         {
           "title": "Trending Feed",
           "section": "Architecture",
           "sourcePath": "docs/trending-feed.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/docs/trending-feed.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/docs/trending-feed.md",
           "slug": "trending-feed"
         },
         {
           "title": "Getting Started",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/getting-started.mdx",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/getting-started.mdx",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/getting-started.mdx",
           "slug": "getting-started"
         },
         {
           "title": "Managing A Node",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/guides/managing-a-node.mdx",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/guides/managing-a-node.mdx",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/guides/managing-a-node.mdx",
           "slug": "guides/managing-a-node"
         },
         {
           "title": "Migrating To Snapchain",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/guides/migrating-to-snapchain.mdx",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/guides/migrating-to-snapchain.mdx",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/guides/migrating-to-snapchain.mdx",
           "slug": "guides/migrating-to-snapchain"
         },
         {
           "title": "Running A Node",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/guides/running-a-node.mdx",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/guides/running-a-node.mdx",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/guides/running-a-node.mdx",
           "slug": "guides/running-a-node"
         },
         {
           "title": "Syncing To Db",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/guides/syncing-to-db.mdx",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/guides/syncing-to-db.mdx",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/guides/syncing-to-db.mdx",
           "slug": "guides/syncing-to-db"
         },
         {
           "title": "Writing Messages",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/guides/writing-messages.mdx",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/guides/writing-messages.mdx",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/guides/writing-messages.mdx",
           "slug": "guides/writing-messages"
         },
         {
           "title": "Index",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/index.mdx",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/index.mdx",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/index.mdx",
           "slug": "index"
         },
         {
           "title": "Node Types",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/node-types.mdx",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/node-types.mdx",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/node-types.mdx",
           "slug": "node-types"
         },
         {
           "title": "Events",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/datatypes/events.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/datatypes/events.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/datatypes/events.md",
           "slug": "reference/datatypes/events"
         },
         {
           "title": "Messages",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/datatypes/messages.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/datatypes/messages.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/datatypes/messages.md",
           "slug": "reference/datatypes/messages"
         },
         {
           "title": "Blocks",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/grpcapi/blocks.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/grpcapi/blocks.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/grpcapi/blocks.md",
           "slug": "reference/grpcapi/blocks"
         },
         {
           "title": "Casts",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/grpcapi/casts.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/grpcapi/casts.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/grpcapi/casts.md",
           "slug": "reference/grpcapi/casts"
         },
         {
           "title": "Events",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/grpcapi/events.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/grpcapi/events.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/grpcapi/events.md",
           "slug": "reference/grpcapi/events"
         },
         {
           "title": "Fids",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/grpcapi/fids.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/grpcapi/fids.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/grpcapi/fids.md",
           "slug": "reference/grpcapi/fids"
         },
         {
           "title": "Grpcapi",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/grpcapi/grpcapi.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/grpcapi/grpcapi.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/grpcapi/grpcapi.md",
           "slug": "reference/grpcapi/grpcapi"
         },
         {
           "title": "Links",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/grpcapi/links.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/grpcapi/links.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/grpcapi/links.md",
           "slug": "reference/grpcapi/links"
         },
         {
           "title": "Message",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/grpcapi/message.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/grpcapi/message.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/grpcapi/message.md",
           "slug": "reference/grpcapi/message"
         },
         {
           "title": "Metadata",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/grpcapi/metadata.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/grpcapi/metadata.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/grpcapi/metadata.md",
           "slug": "reference/grpcapi/metadata"
         },
         {
           "title": "Onchain",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/grpcapi/onchain.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/grpcapi/onchain.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/grpcapi/onchain.md",
           "slug": "reference/grpcapi/onchain"
         },
         {
           "title": "Reactions",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/grpcapi/reactions.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/grpcapi/reactions.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/grpcapi/reactions.md",
           "slug": "reference/grpcapi/reactions"
         },
         {
           "title": "Storagelimits",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/grpcapi/storagelimits.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/grpcapi/storagelimits.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/grpcapi/storagelimits.md",
           "slug": "reference/grpcapi/storagelimits"
         },
         {
           "title": "Userdata",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/grpcapi/userdata.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/grpcapi/userdata.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/grpcapi/userdata.md",
           "slug": "reference/grpcapi/userdata"
         },
         {
           "title": "Usernameproof",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/grpcapi/usernameproof.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/grpcapi/usernameproof.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/grpcapi/usernameproof.md",
           "slug": "reference/grpcapi/usernameproof"
         },
         {
           "title": "Verification",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/grpcapi/verification.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/grpcapi/verification.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/grpcapi/verification.md",
           "slug": "reference/grpcapi/verification"
         },
         {
           "title": "Casts",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/httpapi/casts.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/httpapi/casts.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/httpapi/casts.md",
           "slug": "reference/httpapi/casts"
         },
         {
           "title": "Events",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/httpapi/events.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/httpapi/events.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/httpapi/events.md",
           "slug": "reference/httpapi/events"
         },
         {
           "title": "Fids",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/httpapi/fids.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/httpapi/fids.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/httpapi/fids.md",
           "slug": "reference/httpapi/fids"
         },
         {
           "title": "Httpapi",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/httpapi/httpapi.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/httpapi/httpapi.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/httpapi/httpapi.md",
           "slug": "reference/httpapi/httpapi"
         },
         {
           "title": "Info",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/httpapi/info.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/httpapi/info.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/httpapi/info.md",
           "slug": "reference/httpapi/info"
         },
         {
           "title": "Links",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/httpapi/links.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/httpapi/links.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/httpapi/links.md",
           "slug": "reference/httpapi/links"
         },
         {
           "title": "Message",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/httpapi/message.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/httpapi/message.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/httpapi/message.md",
           "slug": "reference/httpapi/message"
         },
         {
           "title": "Onchain",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/httpapi/onchain.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/httpapi/onchain.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/httpapi/onchain.md",
           "slug": "reference/httpapi/onchain"
         },
         {
           "title": "Reactions",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/httpapi/reactions.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/httpapi/reactions.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/httpapi/reactions.md",
           "slug": "reference/httpapi/reactions"
         },
         {
           "title": "Storagelimits",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/httpapi/storagelimits.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/httpapi/storagelimits.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/httpapi/storagelimits.md",
           "slug": "reference/httpapi/storagelimits"
         },
         {
           "title": "Userdata",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/httpapi/userdata.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/httpapi/userdata.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/httpapi/userdata.md",
           "slug": "reference/httpapi/userdata"
         },
         {
           "title": "Usernameproof",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/httpapi/usernameproof.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/httpapi/usernameproof.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/httpapi/usernameproof.md",
           "slug": "reference/httpapi/usernameproof"
         },
         {
           "title": "Verification",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/reference/httpapi/verification.md",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/reference/httpapi/verification.md",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/reference/httpapi/verification.md",
           "slug": "reference/httpapi/verification"
         },
         {
           "title": "Whitepaper",
           "section": "Protocol docs",
           "sourcePath": "site/docs/pages/whitepaper.mdx",
-          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/c0ce1755d9b7058f79b41c1f236a2b9a7041d348/site/docs/pages/whitepaper.mdx",
+          "githubUrl": "https://github.com/farcasterorg/hypersnap/blob/a85fd221bb311fc2b25670a8215e6ce41e231e8a/site/docs/pages/whitepaper.mdx",
           "slug": "whitepaper"
         }
       ],
